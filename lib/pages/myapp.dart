@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
           title: const Text('Nutri Duda'),
           actions: [
             IconButton(
-              onPressed: () => {print("Logoff")},
+              onPressed: () => {print("Logout")},
               icon: const Icon(Icons.logout),
               tooltip: 'Sair',
             ),
