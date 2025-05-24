@@ -29,6 +29,12 @@ class DB {
     print("Tabela Paciente criada com sucesso.");
   }
 
+  Future<void> deletarBarco() async {
+    final path = join(await getDatabasesPath(), 'nutri_duda.db');
+    await deleteDatabase(path);
+    print('Banco de dados deletado');
+  }
+
   String get _paciente => '''
     CREATE TABLE paciente(
       id INTEGER PRIMARY KEY AUTOINCREMENT,

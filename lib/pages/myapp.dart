@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import './cadastro_paciente.dart';
+import './../database/db.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

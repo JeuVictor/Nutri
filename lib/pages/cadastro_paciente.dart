@@ -197,25 +197,47 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
                     return;
                   }
                   if (_formKey.currentState!.validate()) {
-                    print('nomeController.text testando');
+                    try {
+                      print('nomeController.text testando');
 
-                    final novoPaciente = Pacientesmodels(
-                      nome: nomeController.text,
-                      celular: celularController.text,
-                      email: emailController.text,
-                      idade: int.parse(idadeController.text),
-                      sexo: sexoController,
-                      altura: int.parse(alturaController.text),
-                      peso: double.parse(pesoController.text),
-                      gordura: double.tryParse(gorduraController.text) ?? 0.0,
-                      musculo: double.tryParse(musculoController.text) ?? 0.0,
-                    );
+                      final novoPaciente = Pacientesmodels(
+                        nome: nomeController.text,
+                        celular: celularController.text,
+                        email: emailController.text,
+                        idade: int.parse(idadeController.text),
+                        sexo: sexoController,
+                        altura: int.parse(alturaController.text),
+                        peso: double.parse(pesoController.text),
+                        gordura: double.tryParse(gorduraController.text) ?? 0.0,
+                        musculo: double.tryParse(musculoController.text) ?? 0.0,
+                      );
+                      await PacientesRepository().inserirPacientes(
+                        novoPaciente,
+                      );
 
-                    await PacientesRepository().inserirPacientes(novoPaciente);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Paciente cadastrado!')),
+                      );
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Paciente cadastrado!')),
-                    );
+                      nomeController.clear();
+                      celularController.text = '+55';
+                      emailController.clear();
+                      idadeController.clear();
+                      alturaController.clear();
+                      pesoController.clear();
+                      gorduraController.clear();
+                      musculoController.clear();
+                      setState(() {
+                        sexoController = 'Feminino';
+                      });
+                    } catch (e) {
+                      print('Erro ao salvar paciente: $e');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Erro ao salvar paciente.'),
+                        ),
+                      );
+                    }
                   } else {
                     print('_formKey.currentState!.validate() invalido');
                   }
