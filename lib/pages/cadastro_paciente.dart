@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import './../controllers/cadastroPacientesController.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
+import '../models/pacientesModels.dart';
+import '../repository/pacientes_repository.dart';
 
 class CadastroPaciente extends StatefulWidget {
   const CadastroPaciente({super.key});
@@ -133,6 +135,23 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
                 },
               ),
               TextFormField(
+                controller: pesoController,
+                decoration: const InputDecoration(labelText: 'Peso (kg)'),
+                keyboardType: TextInputType.number,
+                onChanged: (_) => _atualizarGordura(),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Informe o peso';
+                  }
+                  final peso = double.tryParse(value);
+                  if (peso == null || peso <= 0) {
+                    return 'Peso inválida';
+                  }
+                  return null;
+                },
+              ),
+
+              TextFormField(
                 controller: alturaController,
                 decoration: const InputDecoration(labelText: 'Altura (cm)'),
                 keyboardType: TextInputType.number,
@@ -163,7 +182,7 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   final emailVazio = emailController.text.trim().isEmpty;
                   final celularVazio = celularController.text.trim().isEmpty;
 
@@ -178,9 +197,27 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
                     return;
                   }
                   if (_formKey.currentState!.validate()) {
+                    print('nomeController.text testando');
+
+                    final novoPaciente = Pacientesmodels(
+                      nome: nomeController.text,
+                      celular: celularController.text,
+                      email: emailController.text,
+                      idade: int.parse(idadeController.text),
+                      sexo: sexoController,
+                      altura: int.parse(alturaController.text),
+                      peso: double.parse(pesoController.text),
+                      gordura: double.tryParse(gorduraController.text) ?? 0.0,
+                      musculo: double.tryParse(musculoController.text) ?? 0.0,
+                    );
+
+                    await PacientesRepository().inserirPacientes(novoPaciente);
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Paciente cadastrado!')),
                     );
+                  } else {
+                    print('_formKey.currentState!.validate() invalido');
                   }
                 },
                 child: const Text('Salvar'),
