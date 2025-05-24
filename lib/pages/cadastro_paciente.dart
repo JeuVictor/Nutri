@@ -5,7 +5,9 @@ import '../models/pacientesModels.dart';
 import '../repository/pacientes_repository.dart';
 
 class CadastroPaciente extends StatefulWidget {
-  const CadastroPaciente({super.key});
+  final Pacientesmodels? paciente;
+
+  const CadastroPaciente({super.key, this.paciente});
 
   @override
   State<CadastroPaciente> createState() => _CadastroPacienteState();
@@ -24,6 +26,24 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
   final pesoController = TextEditingController();
   final gorduraController = TextEditingController();
   final musculoController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    final paciente = widget.paciente;
+    if (paciente != null) {
+      nomeController.text = paciente.nome;
+      celularController.text = paciente.celular;
+      emailController.text = paciente.email;
+      idadeController.text = paciente.idade.toString();
+      sexoController = paciente.sexo;
+      alturaController.text = paciente.altura.toString();
+      pesoController.text = paciente.peso.toString();
+      gorduraController.text = paciente.gordura.toString();
+      musculoController.text = paciente.musculo.toString();
+    }
+  }
 
   void _atualizarGordura() {
     final peso = double.tryParse(pesoController.text);
@@ -55,9 +75,11 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
 
   @override
   Widget build(BuildContext context) {
+    final isEdicao = widget.paciente != null;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cadastro de paciente'),
+        title: Text(isEdicao ? 'Editar paciente' : 'Cadastro de paciente'),
         centerTitle: true,
       ),
       body: Padding(
@@ -201,6 +223,7 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
                       print('nomeController.text testando');
 
                       final novoPaciente = Pacientesmodels(
+                        id: widget.paciente?.id,
                         nome: nomeController.text,
                         celular: celularController.text,
                         email: emailController.text,
@@ -211,13 +234,23 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
                         gordura: double.tryParse(gorduraController.text) ?? 0.0,
                         musculo: double.tryParse(musculoController.text) ?? 0.0,
                       );
-                      await PacientesRepository().inserirPacientes(
-                        novoPaciente,
-                      );
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Paciente cadastrado!')),
-                      );
+                      if (isEdicao) {
+                        await PacientesRepository().atualizarPaciente(
+                          novoPaciente,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Paciente atualizado!')),
+                        );
+                      } else {
+                        await PacientesRepository().inserirPacientes(
+                          novoPaciente,
+                        );
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Paciente cadastrado!')),
+                        );
+                      }
 
                       nomeController.clear();
                       celularController.text = '+55';
