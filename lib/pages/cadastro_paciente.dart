@@ -46,8 +46,8 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
   }
 
   void _atualizarGordura() {
-    final peso = double.tryParse(pesoController.text);
-    final altura = double.tryParse(alturaController.text);
+    final peso = double.tryParse(pesoController.text.replaceAll(',','.'));
+    final altura = double.tryParse(alturaController.text.replaceAll(',','.'));
     final idade = int.tryParse(idadeController.text);
     if (peso != null && altura != null && idade != null) {
       final gordura = controller.calcularGorduraCorporal(
@@ -165,7 +165,7 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
                   if (value == null || value.isEmpty) {
                     return 'Informe o peso';
                   }
-                  final peso = double.tryParse(value);
+                  final peso = double.tryParse(value.replaceAll(',','.'));
                   if (peso == null || peso <= 0) {
                     return 'Peso inválida';
                   }
@@ -230,9 +230,9 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
                         idade: int.parse(idadeController.text),
                         sexo: sexoController,
                         altura: int.parse(alturaController.text),
-                        peso: double.parse(pesoController.text),
-                        gordura: double.tryParse(gorduraController.text) ?? 0.0,
-                        musculo: double.tryParse(musculoController.text) ?? 0.0,
+                        peso: double.parse(pesoController.text.replaceAll(',','.')),
+                        gordura: double.tryParse(gorduraController.text.replaceAll(',','.')) ?? 0.0,
+                        musculo: double.tryParse(musculoController.text.replaceAll(',','.')) ?? 0.0,
                       );
 
                       if (isEdicao) {
