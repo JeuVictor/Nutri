@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './pages/pesquisa_paciente.dart';
 import './pages/login.dart';
 import './pages/pacientes.dart';
 import './pages/myapp.dart';
@@ -18,6 +19,7 @@ void main() async {
         '/': (context) => const MyApp(),
         '/pacientes': (context) => const Pacientes(),
         '/login': (context) => const Login(),
+        '/pesquisa_paciente': (context) => const PesquisaPaciente(),
       },
     ),
   );

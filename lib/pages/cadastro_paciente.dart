@@ -242,6 +242,8 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Paciente atualizado!')),
                         );
+                        Navigator.pop(context, novoPaciente);
+                        return;
                       } else {
                         await PacientesRepository().inserirPacientes(
                           novoPaciente,

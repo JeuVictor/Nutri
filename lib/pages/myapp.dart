@@ -7,52 +7,50 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Nutri Duda'),
-          actions: [
-            IconButton(
-              onPressed: () => {print("Logout")},
-              icon: const Icon(Icons.logout),
-              tooltip: 'Sair',
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Nutri Duda'),
+        actions: [
+          IconButton(
+            onPressed: () => {print("Logout")},
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sair',
+          ),
+        ],
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: GridView.count(
+          crossAxisCount: 2,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          children: [
+            _buildCard(
+              context,
+              icon: Icons.people,
+              title: 'Pacientes',
+              onTap: () => Navigator.pushNamed(context, '/pacientes'),
+            ),
+            _buildCard(
+              context,
+              icon: Icons.person_add,
+              title: "Cadastrar pacientes",
+              onTap: () => Navigator.pushNamed(context, '/cadastro_paciente'),
+            ),
+            _buildCard(
+              context,
+              icon: Icons.search,
+              title: "Procurar pacientes",
+              onTap: () => Navigator.pushNamed(context, '/pesquisa_paciente'),
+            ),
+            _buildCard(
+              context,
+              icon: Icons.show_chart,
+              title: "Gráficos",
+              onTap: () => Navigator.pushNamed(context, '/cadastro_paciente'),
             ),
           ],
-          centerTitle: true,
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: GridView.count(
-            crossAxisCount: 2,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            children: [
-              _buildCard(
-                context,
-                icon: Icons.people,
-                title: 'Pacientes',
-                onTap: () => Navigator.pushNamed(context, '/pacientes'),
-              ),
-              _buildCard(
-                context,
-                icon: Icons.person_add,
-                title: "Cadastrar pacientes",
-                onTap: () => Navigator.pushNamed(context, '/cadastro_paciente'),
-              ),
-              _buildCard(
-                context,
-                icon: Icons.search,
-                title: "Procurar pacientes",
-                onTap: () => Navigator.pushNamed(context, '/cadastro_paciente'),
-              ),
-              _buildCard(
-                context,
-                icon: Icons.show_chart,
-                title: "Gráficos",
-                onTap: () => Navigator.pushNamed(context, '/cadastro_paciente'),
-              ),
-            ],
-          ),
         ),
       ),
     );

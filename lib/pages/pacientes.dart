@@ -116,13 +116,14 @@ class _PacientesState extends State<Pacientes> {
                         const Icon(Icons.arrow_forward_ios, size: 16),
                       ],
                     ),
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => PacienteDetalhes(paciente: paciente),
                         ),
                       );
+                      _carregarPacientes();
                     },
                   ),
                 );
