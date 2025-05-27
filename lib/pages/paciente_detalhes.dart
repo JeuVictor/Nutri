@@ -145,7 +145,7 @@ class _PacientesDetalhesState extends State<PacienteDetalhes> {
                       style: TextStyle(fontSize: 18),
                     ),
                     Text(
-                      'Altura: ${widget.paciente.altura}',
+                      'Altura: ${widget.paciente.altura} cm',
                       style: TextStyle(fontSize: 18),
                     ),
                     Text(

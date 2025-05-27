@@ -46,9 +46,9 @@ class MyApp extends StatelessWidget {
             ),
             _buildCard(
               context,
-              icon: Icons.show_chart,
-              title: "Gráficos",
-              onTap: () => Navigator.pushNamed(context, '/cadastro_paciente'),
+              icon: Icons.food_bank,
+              title: "Dietas",
+              onTap: () => Navigator.pushNamed(context, '/criar_dieta'),
             ),
           ],
         ),
