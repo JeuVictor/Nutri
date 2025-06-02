@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:nutri/pages/pesquisa_alimentos.dart';
 import './dieta/editar_dieta.dart';
+import './../repository/alimento_repository.dart';
 
 class CriarDieta extends StatefulWidget {
   @override
@@ -92,8 +94,6 @@ class _CriarDieta extends State<CriarDieta> {
     );
   }
 
- 
-
   Widget _infoNutricional({
     required Color cor,
     required String label,
@@ -161,8 +161,7 @@ class _CriarDieta extends State<CriarDieta> {
                         final resultado = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                EditarDieta(nomeInicial: refeicoes[index]),
+                            builder: (_) => EditarDieta(nomeInicial: refeicao),
                           ),
                         );
                         if (resultado != null && resultado['nome'] != null) {

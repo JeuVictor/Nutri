@@ -7,9 +7,13 @@ import './pages/cadastro_paciente.dart';
 import './database/db.dart';
 import 'package:flutter/foundation.dart';
 import './pages/criar_dieta.dart';
+import './repository/alimento_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await DB.instance.database;
+  await popularTabelaAlimentos();
 
   runApp(
     MaterialApp(

@@ -175,9 +175,9 @@ class _PacientesDetalhesState extends State<PacienteDetalhes> {
 '''),
 
                 _infoRow(
-                  "Calorias basais",
+                  "GEB: ",
                   "${calBasal.toStringAsFixed(0)} - kcal",
-                  "Homem: 66 + (13,8 x peso) + (5 x altura cm) – (6,8 x idade)\nMulher: 655 + (9,6 x peso) + (1,9 x altura cm) – (4,7 x idade)",
+                  "GEB (Gasto energético basal) \n Homem: 66 + (13,8 x peso) + (5 x altura cm) – (6,8 x idade)\nMulher: 655 + (9,6 x peso) + (1,9 x altura cm) – (4,7 x idade)",
                 ),
 
                 const SizedBox(height: 12),
@@ -196,9 +196,9 @@ class _PacientesDetalhesState extends State<PacienteDetalhes> {
                   onChanged: (value) => setState(() => nivelAtividade = value!),
                 ),
                 _infoRow(
-                  'Gasto calórico total',
+                  'GET',
                   "${calTotal.toStringAsFixed(0)} kcal",
-                  "Gasto total = Calorias basais x fator de atividade",
+                  "GET (Gasto energético total) = Calorias basais x fator de atividade",
                 ),
                 const Divider(height: 32),
                 Text(
@@ -216,9 +216,9 @@ class _PacientesDetalhesState extends State<PacienteDetalhes> {
                   'Proteína = calorias * 0,25/4',
                 ),
                 _infoRow(
-                  "Gordura",
+                  "Lípidio",
                   "${gordura.toStringAsFixed(0)} g",
-                  'Gordura = calorias * 0,25/9',
+                  'Lípidio = calorias * 0,25/9',
                 ),
 
                 const SizedBox(height: 16),
