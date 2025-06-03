@@ -33,3 +33,4 @@ Future<bool> mostrarDialogoConfirmacao({
 
   return resultado ?? false;
 }
+

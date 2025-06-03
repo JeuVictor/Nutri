@@ -3,6 +3,8 @@ import 'package:nutri/pages/cadastro_paciente.dart';
 import 'package:nutri/repository/alimento_repository.dart';
 import '../../models/alimento_models.dart';
 import '../../repository/pacientes_repository.dart';
+import '../widgets/custom_drawer.dart';
+import '../fuctionsApps/custom_app_bar.dart';
 
 class editarDieta extends StatefulWidget {
   const editarDieta({Key? key}) : super(key: key);
@@ -58,7 +60,8 @@ class _editarDietaState extends State<editarDieta> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Alimentos')),
+      appBar: CustomAppBar(title: 'Alimentos'),
+      drawer: CustomDrawer(),
       body: alimentos.isEmpty
           ? Center(
               child: Column(

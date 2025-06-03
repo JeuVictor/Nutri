@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import './../models/pacientesModels.dart';
 
 class ChartsPacientes extends StatelessWidget {
   final Map<String, double> dados;
@@ -69,6 +70,89 @@ class ChartsPacientes extends StatelessWidget {
         const SizedBox(height: 12),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: legenda),
       ],
+    );
+  }
+}
+
+class PacienteActions extends StatelessWidget {
+  final Pacientesmodels paciente;
+  final VoidCallback onTap;
+  final VoidCallback onEditar;
+  final Future<void> Function(Pacientesmodels paciente) onExcluir;
+  final VoidCallback onCriarDieta;
+
+  const PacienteActions({
+    Key? key,
+    required this.paciente,
+    required this.onTap,
+    required this.onEditar,
+    required this.onExcluir,
+    required this.onCriarDieta,
+  }) : super(key: key);
+
+  Widget itens(
+    BuildContext context,
+    VoidCallback onEditar,
+    VoidCallback onCriarDieta,
+    Pacientesmodels paciente,
+  ) {
+    return PopupMenuButton<String>(
+      onSelected: (value) async {
+        switch (value) {
+          case 'editar':
+            onEditar();
+            break;
+
+          case 'excluir':
+            final confimar = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Confirmar a exclusão'),
+                content: Text('Deseja excluir ${paciente.nome}?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('Cancelar'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text(
+                      'Excluir',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+            );
+            if (confimar == true) {
+              await onExcluir(paciente);
+            }
+            break;
+          case 'dieta':
+            onCriarDieta();
+            break;
+        }
+      },
+      itemBuilder: (context) => const [
+        PopupMenuItem(child: Text('Editar'), value: 'editar'),
+        PopupMenuItem(child: Text('Excluir'), value: 'excluir'),
+        PopupMenuItem(child: Text('Criar Dieta'), value: 'dieta'),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Card(
+      child: ListTile(
+        title: Text(paciente.nome),
+        subtitle: Text(
+          '${paciente.idade} anos | ${paciente.email ?? paciente.celular ?? ''}',
+        ),
+        onTap: onTap,
+        trailing: itens(context, onEditar, onCriarDieta, paciente),
+      ),
     );
   }
 }

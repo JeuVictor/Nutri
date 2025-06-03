@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nutri/models/pacientesModels.dart';
 import './pages/pesquisa_paciente.dart';
 import './pages/login.dart';
 import './pages/pacientes.dart';

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:nutri/pages/pesquisa_alimentos.dart';
 import './dieta/editar_dieta.dart';
 import './../repository/alimento_repository.dart';
+import '../widgets/custom_drawer.dart';
+import '../fuctionsApps/custom_app_bar.dart';
 
 class CriarDieta extends StatefulWidget {
   @override
@@ -120,7 +122,8 @@ class _CriarDieta extends State<CriarDieta> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Criar dieta')),
+      appBar: CustomAppBar(title: 'Criar dieta'),
+      drawer: CustomDrawer(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(12.0),

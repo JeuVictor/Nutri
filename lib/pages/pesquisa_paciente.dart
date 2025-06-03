@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:nutri/pages/cadastro_paciente.dart';
 import '../models/pacientesModels.dart';
 import '../repository/pacientes_repository.dart';
 import './paciente_detalhes.dart';
+import '../widgets/custom_drawer.dart';
+import '../fuctionsApps/custom_app_bar.dart';
+import './../fuctionsApps/charts_pacientes.dart';
 
 class PesquisaPaciente extends StatefulWidget {
   const PesquisaPaciente({Key? key}) : super(key: key);
@@ -75,7 +79,8 @@ class _PesquisaPacienteState extends State<PesquisaPaciente> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Pesquisar Paciente')),
+      appBar: CustomAppBar(title: 'Pesquisar Paciente'),
+      drawer: CustomDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -122,22 +127,37 @@ class _PesquisaPacienteState extends State<PesquisaPaciente> {
                       itemCount: _resultados.length,
                       itemBuilder: (context, index) {
                         final paciente = _resultados[index];
-                        return Card(
-                          child: ListTile(
-                            title: Text(paciente.nome),
-                            subtitle: Text(
-                              '${paciente.idade} anos • ${paciente.email ?? paciente.celular}',
-                            ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      PacienteDetalhes(paciente: paciente),
-                                ),
-                              );
-                            },
-                          ),
+                        return PacienteActions(
+                          paciente: paciente,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    PacienteDetalhes(paciente: paciente),
+                              ),
+                            );
+                          },
+                          onEditar: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    CadastroPaciente(paciente: paciente),
+                              ),
+                            );
+                          },
+                          onCriarDieta: () {
+                            Navigator.pushNamed(
+                              context,
+                              '/criar_dieta',
+                              arguments: paciente,
+                            );
+                          },
+                          onExcluir: (paciente) async {
+                            await _repository.deletarPaciente(paciente.id!);
+                            _buscar('');
+                          },
                         );
                       },
                     ),

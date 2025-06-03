@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nutri/models/alimento_models.dart';
 import '../../repository/alimento_repository.dart';
+import '../../widgets/custom_drawer.dart';
+import '../../fuctionsApps/custom_app_bar.dart';
 
 class EditarDieta extends StatefulWidget {
   final String nomeInicial;
@@ -432,7 +434,8 @@ class _EditarDietaState extends State<EditarDieta> {
     final horaFormatada = _horario.format(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Editar Refeição')),
+      appBar: CustomAppBar(title: 'Editar Refeição'),
+      drawer: CustomDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(

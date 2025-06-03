@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import './cadastro_paciente.dart';
 import './../database/db.dart';
+import '../widgets/custom_drawer.dart';
+import '../fuctionsApps/custom_app_bar.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -20,8 +22,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nutri Duda'),
+      appBar: CustomAppBar(
+        title: 'Nutri Duda',
         actions: [
           IconButton(
             onPressed: () => {print("Logout")},
@@ -29,8 +31,8 @@ class MyApp extends StatelessWidget {
             tooltip: 'Sair',
           ),
         ],
-        centerTitle: true,
       ),
+      drawer: CustomDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: GridView.count(
@@ -60,7 +62,32 @@ class MyApp extends StatelessWidget {
               context,
               icon: Icons.food_bank,
               title: "Dietas",
-              onTap: () => Navigator.pushNamed(context, '/criar_dieta'),
+              onTap: () async {
+                final resposta = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text(" Criar dieta para paciente:"),
+                    content: const Text(
+                      'Gostaria de criar a dieta para um paciente em especifico?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Não'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('Sim'),
+                      ),
+                    ],
+                  ),
+                );
+                if (resposta == true) {
+                  Navigator.pushNamed(context, '/pesquisa_paciente');
+                } else {
+                  Navigator.pushNamed(context, '/criar_dieta');
+                }
+              },
             ),
             _buildCard(
               context,

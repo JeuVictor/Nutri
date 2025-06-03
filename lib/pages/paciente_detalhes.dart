@@ -4,6 +4,8 @@ import 'package:nutri/repository/pacientes_repository.dart';
 import '../models/pacientesModels.dart';
 import '../fuctionsApps/functions_dialogs.dart';
 import '../fuctionsApps/charts_pacientes.dart';
+import './../fuctionsApps/custom_app_bar.dart';
+import '../widgets/custom_drawer.dart';
 
 class PacienteDetalhes extends StatefulWidget {
   final Pacientesmodels paciente;
@@ -120,10 +122,57 @@ class _PacientesDetalhesState extends State<PacienteDetalhes> {
     );
   }
 
+  Widget _buttons() {
+    return CustomDrawer(
+      actions: [
+        DrawerActionItem(
+          icon: Icons.delete,
+          label: 'Deletar',
+          onTap: () => _excluirPaciente(context),
+        ),
+        DrawerActionItem(
+          icon: Icons.edit,
+          label: 'Editar',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => CadastroPaciente(paciente: widget.paciente),
+              ),
+            ).then((_) => Navigator.pop(context));
+          },
+        ),
+        DrawerActionItem(
+          icon: Icons.restaurant_menu,
+          label: 'Criar dieta',
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              '/criar_dieta',
+              arguments: widget.paciente,
+            );
+          },
+        ),
+        DrawerActionItem(
+          icon: Icons.feed_outlined,
+          label: 'Historico',
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Em breve uma nova funcionalidade!😊'),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.paciente.nome)),
+      appBar: CustomAppBar(title: 'Detalhes: ${widget.paciente.nome}'),
+      drawer: _buttons(),
       body: LayoutBuilder(
         builder: (context, constrains) {
           final isWide = constrains.maxHeight > 600;
@@ -255,31 +304,6 @@ class _PacientesDetalhesState extends State<PacienteDetalhes> {
   }
 
   List<Widget> _builButtons(BuildContext context) {
-    return [
-      ElevatedButton.icon(
-        onPressed: () => _excluirPaciente(context),
-        icon: const Icon(Icons.delete),
-        label: const Text('Deletar'),
-      ),
-      const SizedBox(height: 8),
-      ElevatedButton.icon(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => CadastroPaciente(paciente: widget.paciente),
-            ),
-          ).then((_) => Navigator.pop(context));
-        },
-        icon: const Icon(Icons.edit),
-        label: const Text('Editar.'),
-      ),
-      const SizedBox(height: 8),
-      ElevatedButton.icon(
-        onPressed: () {},
-        icon: Icon(Icons.history),
-        label: const Text('Historico'),
-      ),
-    ];
+    return [Wrap(spacing: 16, runSpacing: 16, alignment: WrapAlignment.center)];
   }
 }
