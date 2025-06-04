@@ -1,11 +1,7 @@
-import 'dart:math';
-
 import 'package:sqflite/sqflite.dart';
 import './../database/db.dart';
 import './../database/composicao_alimentos.dart';
-import 'dart:io';
 import '../models/alimento_models.dart';
-import 'package:path/path.dart';
 
 class AlimentoRepository {
   late final Future<Database> _db = DB.instance.database;

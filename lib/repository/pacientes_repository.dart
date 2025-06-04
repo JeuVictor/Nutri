@@ -1,10 +1,6 @@
-import 'dart:io';
-
 import 'package:sqflite/sqflite.dart';
 import '../database/db.dart';
 import '../models/pacientesModels.dart';
-
-import 'package:path/path.dart';
 
 class PacientesRepository {
   late final Future<Database> _db = DB.instance.database;
@@ -57,15 +53,38 @@ class PacientesRepository {
     final db = await _db;
     final filtroFormado = '%$filtro%';
 
+    List<String> whereClauses = [];
+    List<dynamic> whereArgs = [];
+
+    whereClauses.add('nome LIKE ?');
+    whereArgs.add(filtroFormado);
+    whereClauses.add('celular LIKE ?');
+    whereArgs.add(filtroFormado);
+    whereClauses.add('email LIKE ?');
+    whereArgs.add(filtroFormado);
+
+    final idade = int.tryParse(filtro);
+    if (idade != null) {
+      final hoje = DateTime.now();
+
+      final dataLimiteSup = DateTime(hoje.year - idade, hoje.month, hoje.day);
+      final dataLimiteInf = DateTime(
+        hoje.year - idade - 1,
+        hoje.month,
+        hoje.day,
+      ).add(Duration(days: 1));
+
+      final dataSuperior = dataLimiteSup.toIso8601String().substring(0, 10);
+      final dataInferior = dataLimiteInf.toIso8601String().substring(0, 10);
+
+      whereClauses.add('(data_nasc BETWEEN ? AND ?)');
+      whereArgs.addAll([dataInferior, dataSuperior]);
+    }
+
     final resultado = await db.query(
       'paciente',
-      where: '''
-    nome LIKE ? OR
-    CAST(idade AS TEXT) LIKE ? OR
-    celular LIKE ? OR
-    email LIKE ?
-''',
-      whereArgs: [filtroFormado, filtroFormado, filtroFormado, filtroFormado],
+      where: whereClauses.join(' OR '),
+      whereArgs: whereArgs,
     );
     return resultado.map((e) => Pacientesmodels.fromMap(e)).toList();
   }

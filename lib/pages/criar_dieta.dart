@@ -1,16 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:nutri/pages/pesquisa_alimentos.dart';
+import 'package:nutri/pages/myapp.dart';
+import 'package:nutri/repository/dieta_repository.dart';
 import './dieta/editar_dieta.dart';
-import './../repository/alimento_repository.dart';
 import '../widgets/custom_drawer.dart';
 import '../fuctionsApps/custom_app_bar.dart';
+import '../models/pacientesModels.dart';
+import '../models/dieta_models.dart';
 
 class CriarDieta extends StatefulWidget {
+  final Pacientesmodels? paciente;
+  const CriarDieta({super.key, this.paciente});
+
   @override
-  _CriarDieta createState() => _CriarDieta();
+  State<CriarDieta> createState() => _CriarDieta();
 }
 
 class _CriarDieta extends State<CriarDieta> {
+  Pacientesmodels? paciente;
+
+  @override
+  void didChangeDepencies() {
+    super.didChangeDependencies();
+
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args != null && args is Pacientesmodels) {
+      paciente = args;
+    }
+  }
+
   List<String> refeicoes = ['Café da manhã', 'Almoço', 'Jantar'];
 
   String frqueciaSelecionada = 'Todos os dias';
@@ -119,11 +136,52 @@ class _CriarDieta extends State<CriarDieta> {
     );
   }
 
+  void _salvarDieta() async {
+    if (widget.paciente == null) return;
+
+    final novaDieta = DietaModels(
+      nome:
+          'Dieta de ${widget.paciente!.nome} criada em ${DateTime.now().toLocal().toString().split(' ')[0]}',
+      dataCriacao: DateTime.now().toIso8601String(),
+      pacienteId: widget.paciente!.id!,
+    );
+    final dietaRepo = DietaRepository();
+    final id = await dietaRepo.insert(novaDieta);
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Dieta salva com sucesso! ID $id')));
+
+    Navigator.push(context, MaterialPageRoute(builder: (_) => MyApp()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: 'Criar dieta'),
-      drawer: CustomDrawer(),
+      appBar: CustomAppBar(
+        title: widget.paciente != null
+            ? 'Dieta de ${widget.paciente!.nome}'
+            : 'Criar dieta',
+      ),
+      drawer: CustomDrawer(
+        actions: [
+          DrawerActionItem(
+            icon: Icons.local_print_shop_outlined,
+            label: 'Imprimir',
+            onTap: () {
+              Navigator.pop(context);
+              print(paciente);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Função de impressão será implementada futuramente.',
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -155,6 +213,15 @@ class _CriarDieta extends State<CriarDieta> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                refeicoes.removeAt(index);
+                              });
+                            },
+                            icon: Icon(Icons.delete_outline_rounded),
+                          ),
+                          const SizedBox(width: 12),
                           Icon(Icons.drag_handle),
                           const SizedBox(width: 12),
                           Icon(Icons.edit),
@@ -245,6 +312,18 @@ class _CriarDieta extends State<CriarDieta> {
                   }).toList(),
                 ),
               _buildResumoNutricional(),
+              if (widget.paciente != null)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _salvarDieta(),
+                      label: const Text('Salvar dieta'),
+                      icon: const Icon(Icons.save),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

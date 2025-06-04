@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:nutri/pages/cadastro_paciente.dart';
+import 'package:nutri/pages/criar_dieta.dart';
 import '../models/pacientesModels.dart';
 import '../repository/pacientes_repository.dart';
 import './paciente_detalhes.dart';
 import '../widgets/custom_drawer.dart';
 import '../fuctionsApps/custom_app_bar.dart';
 import '../fuctionsApps/charts_pacientes.dart';
+import './criar_dieta.dart';
 
 class Pacientes extends StatefulWidget {
   const Pacientes({Key? key}) : super(key: key);
@@ -90,10 +92,11 @@ class _PacientesState extends State<Pacientes> {
                     _carregarPacientes();
                   },
                   onCriarDieta: () {
-                    Navigator.pushNamed(
+                    Navigator.push(
                       context,
-                      '/criar_dieta',
-                      arguments: paciente,
+                      MaterialPageRoute(
+                        builder: (_) => CriarDieta(paciente: paciente),
+                      ),
                     );
                   },
                 );

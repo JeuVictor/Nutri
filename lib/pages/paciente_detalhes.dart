@@ -17,7 +17,7 @@ class PacienteDetalhes extends StatefulWidget {
 }
 
 class _PacientesDetalhesState extends State<PacienteDetalhes> {
-  String nivelAtividade = 'Sedentário';
+  late String nivelAtividade = widget.paciente.nivelAtividade;
 
   final Map<String, double> fatoresAtividade = {
     'Sedentário': 1.2,

@@ -22,12 +22,14 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
   final nomeController = TextEditingController();
   final celularController = TextEditingController(text: '+55');
   final emailController = TextEditingController();
-  final idadeController = TextEditingController();
   String sexoController = 'Feminino';
   final alturaController = TextEditingController();
   final pesoController = TextEditingController();
   final gorduraController = TextEditingController();
   final musculoController = TextEditingController();
+  String nivelAtividade = 'Moderado';
+  DateTime? dataAlteracao;
+  DateTime? dataNascSelecionada;
 
   @override
   void initState() {
@@ -38,19 +40,88 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
       nomeController.text = paciente.nome;
       celularController.text = paciente.celular;
       emailController.text = paciente.email;
-      idadeController.text = paciente.idade.toString();
+      dataNascSelecionada = DateTime.tryParse(paciente.dataNasc);
       sexoController = paciente.sexo;
       alturaController.text = paciente.altura.toString();
       pesoController.text = paciente.peso.toString();
       gorduraController.text = paciente.gordura.toString();
       musculoController.text = paciente.musculo.toString();
+      nivelAtividade = paciente.nivelAtividade;
+      dataAlteracao = DateTime.tryParse(paciente.dataCriacao);
     }
+  }
+
+  Widget selecionarNascimento() {
+    return GestureDetector(
+      onTap: () async {
+        final hoje = DateTime.now();
+        final dataSelecionada = await showDatePicker(
+          context: context,
+          locale: const Locale('pt', 'BR'),
+          initialDate: dataNascSelecionada ?? DateTime(2000, 1, 1),
+          firstDate: DateTime(1900),
+          lastDate: hoje,
+        );
+        if (dataSelecionada != null) {
+          setState(() {
+            dataNascSelecionada = dataSelecionada;
+          });
+          _atualizarGordura();
+        }
+      },
+      child: AbsorbPointer(
+        child: TextFormField(
+          decoration: const InputDecoration(
+            labelText: 'Data de nascimento',
+            hintText: 'Seleciona a data',
+          ),
+          validator: (value) {
+            if (dataNascSelecionada == null) {
+              return 'informe a data de nascimento';
+            }
+            return null;
+          },
+          controller: TextEditingController(
+            text: dataNascSelecionada == null
+                ? ''
+                : '${dataNascSelecionada!.day.toString().padLeft(2, '0')}/'
+                      '${dataNascSelecionada!.month.toString().padLeft(2, '0')}/'
+                      '${dataNascSelecionada!.year}',
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buttonAtividade() {
+    return DropdownButtonFormField(
+      value: nivelAtividade,
+      decoration: const InputDecoration(labelText: 'Nivel de atividade'),
+      items: [
+        'Sedentário',
+        'Leve',
+        'Moderado',
+        'Ativo',
+        'Extremamente ativo',
+      ].map((a) => DropdownMenuItem(value: a, child: Text(a))).toList(),
+      onChanged: (value) {
+        if (value != null) {
+          setState(() => nivelAtividade = value);
+        }
+      },
+    );
   }
 
   void _atualizarGordura() {
     final peso = double.tryParse(pesoController.text.replaceAll(',', '.'));
     final altura = double.tryParse(alturaController.text.replaceAll(',', '.'));
-    final idade = int.tryParse(idadeController.text);
+    final hoje = DateTime.now();
+    int idade = hoje.year - dataNascSelecionada!.year;
+    if (hoje.month < dataNascSelecionada!.month ||
+        (hoje.month == dataNascSelecionada!.month &&
+            hoje.day < dataNascSelecionada!.day)) {
+      idade--;
+    }
     if (peso != null && altura != null && idade != null) {
       final gordura = controller.calcularGorduraCorporal(
         peso: peso,
@@ -67,7 +138,6 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
     nomeController.dispose();
     celularController.dispose();
     emailController.dispose();
-    idadeController.dispose();
     alturaController.dispose();
     pesoController.dispose();
     gorduraController.dispose();
@@ -79,9 +149,18 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
   Widget build(BuildContext context) {
     final isEdicao = widget.paciente != null;
 
+    if (isEdicao) {
+      final dia = DateTime.parse(widget.paciente!.dataCriacao);
+      dataAlteracao = dia;
+    } else {
+      dataAlteracao = DateTime.now();
+    }
+
     return Scaffold(
       appBar: CustomAppBar(
-        title: (isEdicao ? 'Editar paciente' : 'Cadastro de paciente'),
+        title: (isEdicao
+            ? 'Editar paciente: ${nomeController.text} '
+            : 'Cadastro de paciente'),
       ),
       drawer: CustomDrawer(),
       body: Padding(
@@ -126,22 +205,7 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
                   return null;
                 },
               ),
-              TextFormField(
-                controller: idadeController,
-                decoration: const InputDecoration(labelText: 'Idade'),
-                keyboardType: TextInputType.number,
-                onChanged: (_) => _atualizarGordura(),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Informe a idade';
-                  }
-                  final idade = double.tryParse(value);
-                  if (idade == null || idade <= 0) {
-                    return 'Idade inválida';
-                  }
-                  return null;
-                },
-              ),
+              selecionarNascimento(),
               DropdownButtonFormField(
                 value: sexoController,
                 decoration: const InputDecoration(labelText: 'Sexo'),
@@ -191,6 +255,7 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
                   return null;
                 },
               ),
+              buttonAtividade(),
               TextFormField(
                 controller: gorduraController,
                 decoration: const InputDecoration(
@@ -229,7 +294,7 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
                         nome: nomeController.text,
                         celular: celularController.text,
                         email: emailController.text,
-                        idade: int.parse(idadeController.text),
+                        dataNasc: dataNascSelecionada!.toIso8601String(),
                         sexo: sexoController,
                         altura: int.parse(alturaController.text),
                         peso: double.parse(
@@ -245,6 +310,8 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
                               musculoController.text.replaceAll(',', '.'),
                             ) ??
                             0.0,
+                        dataCriacao: dataAlteracao!.toIso8601String(),
+                        nivelAtividade: nivelAtividade,
                       );
 
                       if (isEdicao) {
@@ -269,13 +336,14 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
                       nomeController.clear();
                       celularController.text = '+55';
                       emailController.clear();
-                      idadeController.clear();
+                      dataNascSelecionada = DateTime(2000, 1, 1);
                       alturaController.clear();
                       pesoController.clear();
                       gorduraController.clear();
                       musculoController.clear();
                       setState(() {
                         sexoController = 'Feminino';
+                        nivelAtividade = 'Moderado';
                       });
                     } catch (e) {
                       print('Erro ao salvar paciente: $e');

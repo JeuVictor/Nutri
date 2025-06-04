@@ -1,8 +1,6 @@
-import 'package:nutri/repository/alimento_repository.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart';
-import './../repository/alimento_repository.dart';
 
 class DB {
   DB._();
@@ -25,8 +23,6 @@ class DB {
     );
   }
 
-
-
   Future<void> _onCreate(Database db, int version) async {
     print('Criando Banco de dados');
     await db.execute(_paciente);
@@ -34,6 +30,15 @@ class DB {
 
     await db.execute(_alimentos);
     print("Tabela alimentos criada com sucesso.");
+
+    await db.execute(_dieta);
+    print("Tabela de dieta criada");
+
+    await db.execute(_refeicao);
+    print("Tabela de _refeicao criada");
+
+    await db.execute(_refeicaoAlimento);
+    print("Tabela de _refeicao_Alimento criada");
   }
 
   Future<void> deletarBanco() async {
@@ -48,12 +53,14 @@ class DB {
       nome TEXT,
       celular TEXT,
       email TEXT,
-      idade INTEGER,
+      data_nasc TEXT,
       sexo TEXT, 
       altura INTEGER,      
       peso REAL,
       gordura REAL,
-      musculo REAL 
+      musculo REAL,
+      nivel_atividade TEXT, 
+      data_criacao TEXT
     );
   ''';
 
@@ -75,5 +82,49 @@ CREATE TABLE alimentos (
     sodio_mg TEXT,
     fibra_alimentar_g TEXT
     );
+''';
+
+  String get _dieta => '''
+  CREATE TABLE dieta(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT,
+    data_criacao TEXT,
+    paciente_id INTEGER,
+    FOREIGN KEY (paciente_id) REFERENCES paciente(id)
+  );
+''';
+  String get _refeicao => '''
+CREATE TABLE refeicao(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome TEXT,
+  horario TEXT,
+  observacoes TEXT,
+  dieta_id INTEGER,
+  FOREIGN KEY (dieta_id) REFERENCES dieta(id)
+);
+''';
+  String get _refeicaoAlimento => '''
+CREATE TABLE refeicao_alimento(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  refeicao_id INTEGER,
+  alimento_id INTEGER,
+    nome TEXT,
+    quantidade REAL,
+    kcal REAL,
+    prot REAL,
+    lip REAL,
+    glic REAL,
+    cal REAL,
+    ferro REAL,
+    vit_a REAL,
+    vit_c REAL,
+    tiamina REAL,
+    ribo REAL,
+    niacina REAL,
+    sodio REAL,
+    fibras REAL,
+    FOREIGN KEY (refeicao_id) REFERENCES refeicao(id),
+    FOREIGN KEY (alimento_id) REFERENCES alimentos(id)
+);
 ''';
 }

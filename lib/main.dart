@@ -9,6 +9,7 @@ import './database/db.dart';
 import 'package:flutter/foundation.dart';
 import './pages/criar_dieta.dart';
 import './repository/alimento_repository.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +29,13 @@ void main() async {
         '/pesquisa_paciente': (context) => const PesquisaPaciente(),
         '/criar_dieta': (context) => CriarDieta(),
       },
+
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('pt', 'BR')],
     ),
   );
 }
