@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:nutri/models/refeicao_alimentos_models.dart';
+import 'package:nutri/models/refeicao_models.dart';
 import 'package:nutri/pages/myapp.dart';
 import 'package:nutri/repository/dieta_repository.dart';
+import 'package:nutri/repository/refeicao_alimento_repository.dart';
+import 'package:nutri/repository/refeicao_repository.dart';
 import './dieta/editar_dieta.dart';
 import '../widgets/custom_drawer.dart';
 import '../fuctionsApps/custom_app_bar.dart';
@@ -17,18 +21,91 @@ class CriarDieta extends StatefulWidget {
 
 class _CriarDieta extends State<CriarDieta> {
   Pacientesmodels? paciente;
+  DietaModels? dietaCriada;
+  bool dietaCriadaJa = false;
+
+  List<Map<String, dynamic>> refeicao = [];
 
   @override
-  void didChangeDepencies() {
+  void didChangeDependencies() {
     super.didChangeDependencies();
 
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args != null && args is Pacientesmodels) {
       paciente = args;
+    } else {
+      paciente = widget.paciente;
     }
   }
 
-  List<String> refeicoes = ['Café da manhã', 'Almoço', 'Jantar'];
+  List<Map<String, dynamic>> refeicoes = [
+    {
+      'nome': 'Café da manhã',
+      'horario': '',
+      'observacoes': '',
+      'alimentos': [],
+      'calcNutri': [],
+    },
+    {'nome': 'Almoço', 'horario': '', 'observacoes': '', 'alimentos': [
+       
+      ],
+    },
+    {'nome': 'Jantar', 'horario': '', 'observacoes': '', 'alimentos': []},
+  ];
+
+  Map<String, double> calcularNutris(List<Map> refeicoes) {
+    double kcal = 0.0;
+    double carbo = 0.0;
+    double prot = 00.0;
+    double gord = 00.0;
+    double calcio = 00.0;
+    double ferro = 00.0;
+    double vitA = 00.0;
+    double vitc = 0.0;
+    double tiamina = 00.0;
+    double ribo = 0.0;
+    double niacina = 00.0;
+    double sodio = 00.0;
+    double fibra = 00.0;
+    for (final al in refeicoes) {
+      final alimentos = List<Map<String, dynamic>>.from(al['alimentos'] ?? []);
+      for (var a in alimentos) {
+        kcal += parseDouble(a['energia_kcal']);
+        carbo += parseDouble(a['glicidios_g']);
+        prot += parseDouble(a['proteinas_g']);
+        gord += parseDouble(a['lipidios_g']);
+        calcio += parseDouble(a['calcio_mg']);
+        ferro += parseDouble(a['ferro_mg']);
+        vitA += parseDouble(a['vit_a_mmg']);
+        vitc += parseDouble(a['vit_c_mg']);
+        tiamina += parseDouble(a['tiamina_mg']);
+        ribo += parseDouble(a['riboflavina_mg']);
+        niacina += parseDouble(a['niacina_mg']);
+        sodio += parseDouble(a['sodio_mg']);
+        fibra += parseDouble(a['fibra_alimentar_g']);
+      }
+    }
+    return {
+      'kcal': kcal,
+      'carbo': carbo,
+      'prot': prot,
+      'gord': gord,
+      'calcio': calcio,
+      'ferro': ferro,
+      'vitA': vitA,
+      'vitc': vitc,
+      'tiamina': tiamina,
+      'ribo': ribo,
+      'niacina': niacina,
+      'sodio': sodio,
+      'fibra': fibra,
+    };
+  }
+
+  double totalNutri(String tema, List<Map> refeicoes) {
+    final result = calcularNutris(refeicoes);
+    return result[tema] ?? 0.0;
+  }
 
   String frqueciaSelecionada = 'Todos os dias';
   Map<String, bool> diasSelecionados = {
@@ -43,14 +120,20 @@ class _CriarDieta extends State<CriarDieta> {
 
   void _adicionarRefeicao() {
     setState(() {
-      refeicoes.add('Nova Refeição ${refeicoes.length + 1}');
+      refeicoes.add({
+        'nome': 'Nova Refeição ${refeicoes.length + 1}',
+        'horario': '',
+        'observacoes': '',
+        'alimentos': [],
+        'calcNutri': [],
+      });
     });
   }
 
-  final double totalKcal = 1800;
-  final double totalCarbo = 300;
-  final double totalProteina = 120;
-  final double totalLipidio = 60;
+  double get totalKcal => paciente?.calcKcall ?? 0.0;
+  double get totalCarbo => paciente?.carboidratros ?? 0.0;
+  double get totalProteina => paciente?.proteina ?? 0.0;
+  double get totalLipidio => paciente?.lipidios ?? 0.0;
 
   Widget _buildResumoNutricional() {
     return Container(
@@ -67,7 +150,7 @@ class _CriarDieta extends State<CriarDieta> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Resumo nutricional total',
+            'Quantidade nutricional necessária',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -80,7 +163,8 @@ class _CriarDieta extends State<CriarDieta> {
               _infoNutricional(
                 cor: Colors.orange,
                 label: 'kcal',
-                valor: totalKcal,
+                valorAtual: totaisAtuais['kcal'] ?? 0.0,
+                valorMeta: totalKcal,
                 icon: Icons.local_fire_department,
               ),
               Row(
@@ -89,19 +173,22 @@ class _CriarDieta extends State<CriarDieta> {
                   _infoNutricional(
                     cor: Colors.green,
                     label: 'Carboídratos',
-                    valor: totalCarbo,
+                    valorAtual: totaisAtuais['carbo'] ?? 0.0,
+                    valorMeta: totalCarbo,
                     icon: Icons.breakfast_dining,
                   ),
                   _infoNutricional(
                     cor: Colors.blue,
                     label: 'Proteínas',
-                    valor: totalProteina,
+                    valorAtual: totaisAtuais['prot'] ?? 0.0,
+                    valorMeta: totalProteina,
                     icon: Icons.fitness_center,
                   ),
                   _infoNutricional(
                     cor: Colors.pink,
                     label: 'Lipídios',
-                    valor: totalLipidio,
+                    valorAtual: totaisAtuais['gord'] ?? 0.0,
+                    valorMeta: totalLipidio,
                     icon: Icons.opacity,
                   ),
                 ],
@@ -116,61 +203,172 @@ class _CriarDieta extends State<CriarDieta> {
   Widget _infoNutricional({
     required Color cor,
     required String label,
-    required double valor,
+    required double valorAtual,
+    required double valorMeta,
     required IconData icon,
   }) {
     return Column(
       children: [
         Icon(icon, size: 28, color: cor),
-        SizedBox(height: 6),
+        SizedBox(height: 4),
         Text(
-          '${valor.toStringAsFixed(0)}',
+          '${valorAtual.toStringAsFixed(0)}',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: cor,
           ),
         ),
-        Text(label, style: TextStyle(fontSize: 14, color: cor)),
+        SizedBox(height: 2),
+        Text(
+          'Meta: ${valorMeta.toStringAsFixed(0)}',
+          style: TextStyle(fontSize: 11, color: cor.withOpacity(0.7)),
+        ),
+        SizedBox(height: 2),
+        Text(label, style: TextStyle(fontSize: 13, color: cor)),
       ],
     );
   }
 
-  void _salvarDieta() async {
-    if (widget.paciente == null) return;
-
+  Future<int> salvarDieta() async {
     final novaDieta = DietaModels(
       nome:
-          'Dieta de ${widget.paciente!.nome} criada em ${DateTime.now().toLocal().toString().split(' ')[0]}',
+          'Dieta de ${paciente!.nome} criada em ${DateTime.now().toLocal().toString().split(' ')[0]}',
       dataCriacao: DateTime.now().toIso8601String(),
-      pacienteId: widget.paciente!.id!,
+      pacienteId: paciente!.id!,
     );
-    final dietaRepo = DietaRepository();
-    final id = await dietaRepo.insert(novaDieta);
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Dieta salva com sucesso! ID $id')));
-
-    Navigator.push(context, MaterialPageRoute(builder: (_) => MyApp()));
+    return await DietaRepository().insert(novaDieta);
   }
+
+  Future<List<int>> salvarRefeicoes(int idDiet) async {
+    final refeicaoRepo = RefeicaoRepository();
+
+    List<int> ids = [];
+
+    for (var ref in refeicoes) {
+      final novaRefecao = RefeicaoModels(
+        nome: ref['nome'],
+        horario: ref['horario'],
+        observacoes: ref['observacoes'],
+        dietaId: idDiet,
+      );
+      final id = await refeicaoRepo.insert(novaRefecao);
+      ids.add(id);
+    }
+    return ids;
+  }
+
+  double parseDouble(dynamic value) {
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
+  }
+
+  Future<void> salvarRefeicaoAlimentos(List<int> refeicaoIds) async {
+    final repo = RefeicaoAlimentoRepository();
+    for (int i = 0; i < refeicoes.length; i++) {
+      final alimentos = refeicoes[i]['alimentos'] as List<Map<String, dynamic>>;
+      print(
+        'Refeição ${refeicoes[i]['nome']} com ${alimentos.length} alimentos',
+      );
+      for (var alimento in alimentos) {
+        final model = RefeicaoAlimentosModels(
+          refeicaoId: refeicaoIds[i],
+          alimentoId: alimento['id'],
+          nome: alimento['nome'],
+          quantidade: parseDouble(alimento['quantidade']),
+          kcal: parseDouble(alimento['energia_kcal']),
+          prot: parseDouble(alimento['proteinas_g']),
+          lip: parseDouble(alimento['lipidios_g']),
+          glic: parseDouble(alimento['glicidios_g']),
+          cal: parseDouble(alimento['calcio_mg']),
+          ferro: parseDouble(alimento['ferro_mg']),
+          vitA: parseDouble(alimento['vit_a_mmg']),
+          vitC: parseDouble(alimento['vit_c_mg']),
+          tiamina: parseDouble(alimento['tiamina_mg']),
+          ribo: parseDouble(alimento['riboflavina_mg']),
+          niacina: parseDouble(alimento['niacina_mg']),
+          sodio: parseDouble(alimento['sodio_mg']),
+          fibras: parseDouble(alimento['fibra_alimentar_g']),
+        );
+        try {
+          await repo.insert(model);
+        } catch (e) {
+          print('Erro ao inserir o model de alimentos_refeição: e: $e');
+        }
+      }
+    }
+  }
+
+  void _salvarDietaTotal() async {
+    try {
+      final idDiet = await salvarDieta();
+      final idsRefeicao = await salvarRefeicoes(idDiet);
+      await salvarRefeicaoAlimentos(idsRefeicao);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Dieta salva com sucesso! dieta ID $idDiet')),
+      );
+    } catch (e) {
+      print('Erro = $e');
+    }
+
+    final all = await DietaRepository().joinDieta();
+    for (var row in all) {
+      print(' ---- REGISTRO -----');
+      row.forEach((key, value) {
+        print('$key: $value');
+      });
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => MyApp()),
+    );
+  }
+
+  Map<String, double> get totaisAtuais => calcularNutris(refeicoes);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: widget.paciente != null
-            ? 'Dieta de ${widget.paciente!.nome}'
-            : 'Criar dieta',
+        title: paciente != null ? 'Dieta de ${paciente!.nome}' : 'Criar dieta',
       ),
       drawer: CustomDrawer(
         actions: [
           DrawerActionItem(
             icon: Icons.local_print_shop_outlined,
             label: 'Imprimir',
-            onTap: () {
+            onTap: () async {
               Navigator.pop(context);
-              print(paciente);
+
+              final dietaRepo = DietaRepository();
+              final teste = await dietaRepo.getAll();
+
+              try {
+                if (paciente != null) {
+                  print('id do paciente: ${paciente!.id}');
+                } else {
+                  print('Paciente  nulo.');
+                }
+              } catch (e) {
+                print('Erro ao puxar id do paciente: Error $e');
+              }
+              try {
+                for (var t in teste) {
+                  print(
+                    'Id: ${t.id}, Nome: ${t.nome}, Data: ${t.dataCriacao}, PacienteId: ${t.pacienteId}',
+                  );
+                }
+                print(
+                  'BD dietas está operando normalmente ${dietaCriada.toString()}',
+                );
+              } catch (e) {
+                print('BD dietas NÃO está operando normalmente: ERROR $e');
+              }
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text(
@@ -200,16 +398,23 @@ class _CriarDieta extends State<CriarDieta> {
                 },
                 children: refeicoes.asMap().entries.map((entry) {
                   int index = entry.key;
-                  String refeicao = entry.value;
+                  Map<String, dynamic> refeicao = entry.value;
 
                   return Card(
-                    key: ValueKey(refeicao),
+                    key: ValueKey(refeicao['nome']),
                     margin: const EdgeInsets.symmetric(
                       vertical: 6.0,
                       horizontal: 4,
                     ),
                     child: ListTile(
-                      title: Text(refeicao),
+                      title: Text(
+                        refeicao['nome'] + ' | ' + refeicao['horario'],
+                      ),
+                      subtitle: Text(
+                        ('\n' + refeicao['observacoes']),
+                        maxLines: 3,
+                      ),
+
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -231,12 +436,12 @@ class _CriarDieta extends State<CriarDieta> {
                         final resultado = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => EditarDieta(nomeInicial: refeicao),
+                            builder: (_) => EditarDieta(dataRefeicao: refeicao),
                           ),
                         );
                         if (resultado != null && resultado['nome'] != null) {
                           setState(() {
-                            refeicoes[index] = resultado['nome'];
+                            refeicoes[index] = resultado;
                           });
                         }
                       },
@@ -312,13 +517,13 @@ class _CriarDieta extends State<CriarDieta> {
                   }).toList(),
                 ),
               _buildResumoNutricional(),
-              if (widget.paciente != null)
+              if (paciente != null)
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: () => _salvarDieta(),
+                      onPressed: () => _salvarDietaTotal(),
                       label: const Text('Salvar dieta'),
                       icon: const Icon(Icons.save),
                     ),

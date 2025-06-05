@@ -19,6 +19,19 @@ class DietaModels {
       pacienteId: map['paciente_id'],
     );
   }
+  DietaModels copyWith({
+    int? id,
+    String? nome,
+    String? dataCriacao,
+    int? pacienteId,
+  }) {
+    return DietaModels(
+      id: id ?? this.id,
+      nome: nome ?? this.nome,
+      dataCriacao: dataCriacao ?? this.dataCriacao,
+      pacienteId: pacienteId ?? this.pacienteId,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -28,4 +41,7 @@ class DietaModels {
       'paciente_id': pacienteId,
     };
   }
+
+
+  
 }

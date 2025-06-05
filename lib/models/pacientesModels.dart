@@ -40,6 +40,28 @@ class Pacientesmodels {
     return idadeCalculada;
   }
 
+  final Map<String, double> fatoresAtividade = {
+    'Sedentário': 1.2,
+    'Leve': 1.375,
+    'Moderado': 1.55,
+    'Ativo': 1.725,
+    'Extremamente ativo': 1.9,
+  };
+
+  double get calBasal {
+    if (sexo.toLowerCase() == 'masculino') {
+      return 88.362 + (13.397 * peso) + (4.799 * altura) - (5.677 * idade);
+    } else {
+      return 447.593 + (9.247 * peso) + (3.098 * altura) - (4.330 * idade);
+    }
+  }
+
+  double get calcKcall => calBasal * fatoresAtividade[nivelAtividade]!;
+
+  double get carboidratros => (calcKcall * 0.5) / 4;
+  double get proteina => (calcKcall * 0.25) / 4;
+  double get lipidios => (calcKcall * 0.25) / 9;
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,

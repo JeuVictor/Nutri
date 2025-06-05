@@ -3,10 +3,15 @@ import 'package:nutri/models/alimento_models.dart';
 import '../../repository/alimento_repository.dart';
 import '../../widgets/custom_drawer.dart';
 import '../../fuctionsApps/custom_app_bar.dart';
+import '../../models/dieta_models.dart';
+import '../../models/refeicao_models.dart';
+import '../../models/refeicao_alimentos_models.dart';
+import '../../repository/refeicao_alimento_repository.dart';
+import '../../repository/refeicao_repository.dart';
 
 class EditarDieta extends StatefulWidget {
-  final String nomeInicial;
-  const EditarDieta({Key? key, required this.nomeInicial}) : super(key: key);
+  final Map<String, dynamic> dataRefeicao;
+  const EditarDieta({Key? key, required this.dataRefeicao}) : super(key: key);
 
   @override
   _EditarDietaState createState() => _EditarDietaState();
@@ -44,8 +49,11 @@ class _EditarDietaState extends State<EditarDieta> {
   @override
   void initState() {
     super.initState();
-    _nomeController = TextEditingController(text: widget.nomeInicial);
-    _obsController = TextEditingController();
+    _nomeController = TextEditingController(text: widget.dataRefeicao['nome']);
+    _obsController = TextEditingController(
+      text: widget.dataRefeicao['observacoes'],
+    );
+
     _searchController = TextEditingController();
   }
 
@@ -128,6 +136,7 @@ class _EditarDietaState extends State<EditarDieta> {
     final proporcao = quantidade / 100.0;
 
     final selecionado = AlimentoModels(
+      id: alimentoEscolhido.id,
       nome: alimentoEscolhido.nome,
       quantidade: quantidade,
       energia_kcal: alimentoEscolhido.energia_kcal * proporcao,
@@ -492,8 +501,19 @@ class _EditarDietaState extends State<EditarDieta> {
             ElevatedButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Botão pressionado')),
+                  const SnackBar(content: Text('Salvo com sucesso')),
                 );
+                final resultado = {
+                  'nome': _nomeController.text,
+                  'horario': horaFormatada.toString(),
+                  'observacoes': _obsController.text,
+                  'alimentos': _alimentosSelecionados
+                      .map((alimento) => alimento.toMap())
+                      .toList(),
+                  'calcNutri': calcularTotais().toMap(),
+                };
+                print('Refeção salva: $resultado');
+                Navigator.pop(context, resultado);
               },
               child: const Text('Salvar'),
             ),

@@ -47,21 +47,8 @@ class _PacientesDetalhesState extends State<PacienteDetalhes> {
     return (1.2 * imc) - (10.8 * s) + (0.23 * widget.paciente.idade) - 5.4;
   }
 
-  double get calBasal {
-    if (widget.paciente.sexo.toLowerCase() == 'masculino') {
-      return 88.362 +
-          (13.397 * widget.paciente.peso) +
-          (4.799 * widget.paciente.altura) -
-          (5.677 * widget.paciente.idade);
-    } else {
-      return 447.593 +
-          (9.247 * widget.paciente.peso) +
-          (3.098 * widget.paciente.altura) -
-          (4.330 * widget.paciente.idade);
-    }
-  }
-
-  double get calTotal => calBasal * fatoresAtividade[nivelAtividade]!;
+  double get calTotal =>
+      widget.paciente.calBasal * fatoresAtividade[nivelAtividade]!;
 
   double get carboidratros => (calTotal * 0.5) / 4;
   double get proteina => (calTotal * 0.25) / 4;
@@ -225,7 +212,7 @@ class _PacientesDetalhesState extends State<PacienteDetalhes> {
 
                 _infoRow(
                   "GEB: ",
-                  "${calBasal.toStringAsFixed(0)} - kcal",
+                  "${widget.paciente.calBasal.toStringAsFixed(0)} - kcal",
                   "GEB (Gasto energético basal) \n Homem: 66 + (13,8 x peso) + (5 x altura cm) – (6,8 x idade)\nMulher: 655 + (9,6 x peso) + (1,9 x altura cm) – (4,7 x idade)",
                 ),
 
