@@ -6,14 +6,14 @@ import '../../repository/pacientes_repository.dart';
 import '../widgets/custom_drawer.dart';
 import '../fuctionsApps/custom_app_bar.dart';
 
-class editarDieta extends StatefulWidget {
-  const editarDieta({Key? key}) : super(key: key);
+class PesquisaAlimentos extends StatefulWidget {
+  const PesquisaAlimentos({Key? key}) : super(key: key);
 
   @override
-  State<editarDieta> createState() => _editarDietaState();
+  State<PesquisaAlimentos> createState() => _pesquisaAlimentos();
 }
 
-class _editarDietaState extends State<editarDieta> {
+class _pesquisaAlimentos extends State<PesquisaAlimentos> {
   List<AlimentoModels> alimentos = [];
 
   @override

@@ -39,6 +39,9 @@ class DB {
 
     await db.execute(_refeicaoAlimento);
     print("Tabela de _refeicao_Alimento criada");
+
+    await db.execute(_usuario);
+    print("Tabela de _usuario criada");
   }
 
   Future<void> deletarBanco() async {
@@ -126,5 +129,19 @@ CREATE TABLE refeicao_alimento(
     FOREIGN KEY (refeicao_id) REFERENCES refeicao(id),
     FOREIGN KEY (alimento_id) REFERENCES alimentos(id)
 );
+''';
+
+  String get _usuario => '''
+  CREATE TABLE usuario(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    crn TEXT NOT NULL,
+    telefone TEXT NOT NULL,
+    email TEXT,
+    esp TEXT,
+    endereco TEXT,
+    caminhoImg TEXT,
+    corTema TEXT
+  );
 ''';
 }

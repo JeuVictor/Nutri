@@ -6,7 +6,8 @@ import './pages/pacientes.dart';
 import './pages/myapp.dart';
 import './pages/cadastro_paciente.dart';
 import './database/db.dart';
-import 'package:flutter/foundation.dart';
+import './pages/usuario.dart';
+import './pages/pesquisa_alimentos.dart';
 import './pages/criar_dieta.dart';
 import './repository/alimento_repository.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -28,6 +29,8 @@ void main() async {
         '/cadastro_paciente': (context) => const CadastroPaciente(),
         '/pesquisa_paciente': (context) => const PesquisaPaciente(),
         '/criar_dieta': (context) => CriarDieta(),
+        '/usuario': (context) => Usuario(),
+        '/pesquisa_alimentos': (context) => PesquisaAlimentos(),
       },
 
       localizationsDelegates: const [

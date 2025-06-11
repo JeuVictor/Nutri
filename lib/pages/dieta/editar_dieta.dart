@@ -55,6 +55,7 @@ class _EditarDietaState extends State<EditarDieta> {
     );
 
     _searchController = TextEditingController();
+    receberAlimentos();
   }
 
   @override
@@ -157,6 +158,16 @@ class _EditarDietaState extends State<EditarDieta> {
     setState(() {
       _alimentosSelecionados.add(selecionado);
     });
+  }
+
+  void receberAlimentos() {
+    final dados = widget.dataRefeicao['alimentos'];
+
+    if (dados != null && dados.length >= 1) {
+      for (var item in dados) {
+        _alimentosSelecionados.add(AlimentoModels.fromMap(item));
+      }
+    }
   }
 
   Widget _buildListarAlimentos() {
@@ -382,7 +393,6 @@ class _EditarDietaState extends State<EditarDieta> {
       onPressed: () {
         setState(() {
           _mostrarBuscaAvancada = true;
-          print('botão é: $_mostrarBuscaAvancada');
         });
       },
       child: const Text('Busca avançada'),

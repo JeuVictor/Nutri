@@ -60,6 +60,7 @@ class AlimentoModels {
     return AlimentoModels(
       id: map['id'],
       nome: map['nome'] ?? '',
+      quantidade: map['quantidade'] ?? 0.0,
       energia_kcal: double.tryParse(map['energia_kcal'].toString()) ?? 0.0,
       proteinas_g: double.tryParse(map['proteinas_g'].toString()) ?? 0.0,
       lipidios_g: double.tryParse(map['lipidios_g'].toString()) ?? 0.0,

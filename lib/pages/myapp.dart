@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
-import './cadastro_paciente.dart';
 import './../database/db.dart';
 import '../widgets/custom_drawer.dart';
 import '../fuctionsApps/custom_app_bar.dart';
@@ -92,14 +90,14 @@ class MyApp extends StatelessWidget {
             _buildCard(
               context,
               icon: Icons.edit,
-              title: "Editar Alimmentos",
-              onTap: () => _mostrarMensagem(context),
+              title: "Editar Alimentos",
+              onTap: () => Navigator.pushNamed(context, '/pesquisa_alimentos'),
             ),
             _buildCard(
               context,
               icon: Icons.person_pin,
               title: "Perfil do usuário.",
-              onTap: () => _mostrarMensagem(context),
+              onTap: () => Navigator.pushNamed(context, '/usuario'),
             ),
 
             //Botão para excluir o banco de dados

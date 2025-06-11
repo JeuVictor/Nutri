@@ -82,6 +82,17 @@ class AlimentoRepository {
 
     return resultado.map((e) => AlimentoModels.fromMap(e)).toList();
   }
+
+  Future<bool> alimentoExiste(String nome) async {
+    final db = await _db;
+    final resultado = await db.query(
+      'alimentos',
+      where: 'LOWER(TRIM(nome)) = ?',
+      whereArgs: [nome.trim().toLowerCase()],
+    );
+
+    return resultado.isNotEmpty;
+  }
 }
 
 Future<void> popularTabelaAlimentos() async {
@@ -89,22 +100,28 @@ Future<void> popularTabelaAlimentos() async {
     final db = await DB.instance.database;
 
     for (var alimento in composicaoQuimicaAlimentos) {
-      await db.insert("alimentos", {
-        'nome': alimento["Alimento"] ?? '',
-        'energia_kcal': alimento["Energia (kcal)"] ?? '',
-        'proteinas_g': alimento["Proteínas (g)"] ?? '',
-        'lipidios_g': alimento["Lipídios (g)"] ?? '',
-        'glicidios_g': alimento["Glicídios (g)"] ?? '',
-        'calcio_mg': alimento["Cálcio (mg)"] ?? '',
-        'ferro_mg': alimento["Ferro (mg)"] ?? '',
-        'vit_a_mmg': alimento["Vit A (mmg)"] ?? '',
-        'vit_c_mg': alimento["Vit C (mg)"] ?? '',
-        'tiamina_mg': alimento["Tiamina (mg)"] ?? '',
-        'riboflavina_mg': alimento["Riboflavina (mg)"] ?? '',
-        'niacina_mg': alimento["Niacina (mg)"] ?? '',
-        'sodio_mg': alimento["Sódio (mg)"] ?? '',
-        'fibra_alimentar_g': alimento["Fibra alimentar (g)"] ?? '',
-      });
+      final nome = alimento["Alimento"] ?? '';
+
+      final existe = await AlimentoRepository().alimentoExiste(nome);
+
+      if (!existe) {
+        await db.insert("alimentos", {
+          'nome': alimento["Alimento"] ?? '',
+          'energia_kcal': alimento["Energia (kcal)"] ?? '',
+          'proteinas_g': alimento["Proteínas (g)"] ?? '',
+          'lipidios_g': alimento["Lipídios (g)"] ?? '',
+          'glicidios_g': alimento["Glicídios (g)"] ?? '',
+          'calcio_mg': alimento["Cálcio (mg)"] ?? '',
+          'ferro_mg': alimento["Ferro (mg)"] ?? '',
+          'vit_a_mmg': alimento["Vit A (mmg)"] ?? '',
+          'vit_c_mg': alimento["Vit C (mg)"] ?? '',
+          'tiamina_mg': alimento["Tiamina (mg)"] ?? '',
+          'riboflavina_mg': alimento["Riboflavina (mg)"] ?? '',
+          'niacina_mg': alimento["Niacina (mg)"] ?? '',
+          'sodio_mg': alimento["Sódio (mg)"] ?? '',
+          'fibra_alimentar_g': alimento["Fibra alimentar (g)"] ?? '',
+        });
+      }
     }
     print('Tabela Alimentos populada com sucesso!');
   } catch (e) {
