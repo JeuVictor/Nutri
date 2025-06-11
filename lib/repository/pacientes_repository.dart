@@ -5,9 +5,9 @@ import '../models/pacientesModels.dart';
 class PacientesRepository {
   late final Future<Database> _db = DB.instance.database;
 
-  Future<void> inserirPacientes(Pacientesmodels paciente) async {
+  Future<int> inserirPacientes(Pacientesmodels paciente) async {
     final db = await _db;
-    await db.insert(
+    return await db.insert(
       'paciente',
       paciente.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,

@@ -105,16 +105,23 @@ class _UsuarioState extends State<Usuario> {
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
           child: Row(
             children: [
+              IconButton(
+                onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Essa cor será utilizada futuramente como tema dos PDFs dos pacientes.',
+                    ),
+                    duration: Duration(seconds: 3),
+                  ),
+                ),
+                icon: Icon(Icons.info_outline_rounded),
+              ),
               const Text(
                 'Cor do tema:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(width: 12),
-              Tooltip(
-                message:
-                    'Essa cor será utilizada futuramente como tema dos PDFs dos pacientes.',
-                child: const Icon(Icons.info_outline, size: 24),
-              ),
+
               const Spacer(),
 
               GestureDetector(
@@ -295,11 +302,16 @@ class _UsuarioState extends State<Usuario> {
               ),
               const SizedBox(height: 16),
 
-              _colorBtn(corTema?.toColor(), _editando, (novaCor) {
-                setState(() {
-                  corTema = novaCor;
-                });
-              }, context),
+              _colorBtn(
+                corTema != null ? Color(int.parse(corTema!, radix: 16)) : null,
+                _editando,
+                (novaCor) {
+                  setState(() {
+                    corTema = novaCor;
+                  });
+                },
+                context,
+              ),
               const SizedBox(height: 16),
               if (_editando)
                 ElevatedButton.icon(

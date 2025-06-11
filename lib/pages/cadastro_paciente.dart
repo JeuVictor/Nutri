@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:nutri/models/historico_paciente_models.dart';
+import 'package:nutri/repository/historico_paciente_repository.dart';
 import './../controllers/cadastroPacientesController.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import '../models/pacientesModels.dart';
@@ -49,6 +51,90 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
       nivelAtividade = paciente.nivelAtividade;
       dataAlteracao = DateTime.tryParse(paciente.dataCriacao);
     }
+  }
+
+  bool _contatoValido() {
+    final emailVazio = emailController.text.trim().isEmpty;
+    final celularVazio = celularController.text.trim().isEmpty;
+
+    if (emailVazio && celularVazio) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Informe ao menos um meio de contato. (Celular ou email) ',
+          ),
+        ),
+      );
+      return false;
+    }
+    return true;
+  }
+
+  Pacientesmodels _construirPacientes() {
+    return Pacientesmodels(
+      id: widget.paciente?.id,
+      nome: nomeController.text,
+      celular: celularController.text,
+      email: emailController.text,
+      dataNasc: dataNascSelecionada!.toIso8601String(),
+      sexo: sexoController,
+      altura: int.parse(alturaController.text),
+      peso: double.parse(pesoController.text.replaceAll(',', '.')),
+      gordura:
+          double.tryParse(gorduraController.text.replaceAll(',', '.')) ?? 0.0,
+      musculo:
+          double.tryParse(musculoController.text.replaceAll(',', '.')) ?? 0.0,
+      dataCriacao: dataAlteracao!.toIso8601String(),
+      nivelAtividade: nivelAtividade,
+    );
+  }
+
+  Future<void> _salvarPaciente(Pacientesmodels paciente) async {
+    final isEdicao = widget.paciente != null;
+
+    if (isEdicao) {
+      await PacientesRepository().atualizarPaciente(paciente);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Paciente atualizado!')));
+      Navigator.pop(context, paciente);
+    } else {
+      final id = await PacientesRepository().inserirPacientes(paciente);
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Paciente cadastrado!')));
+      try {
+        await HistoricoPacienteRepository().inserir(
+          HistoricoPaciente(
+            pacienteId: id,
+            peso: paciente.peso,
+            nivelAtv: paciente.nivelAtividade,
+            dataAtt: paciente.dataCriacao,
+            gordura: paciente.gordura ?? 0.0,
+            musculo: paciente.musculo ?? 0.0,
+          ),
+        );
+      } catch (e) {
+        print('Erro ao incluir os dados em historico do paciente erro: $e');
+      }
+      _limparFormulario();
+    }
+  }
+
+  void _limparFormulario() {
+    nomeController.clear();
+    celularController.text = '+55';
+    emailController.clear();
+    dataNascSelecionada = DateTime(2000, 1, 1);
+    alturaController.clear();
+    pesoController.clear();
+    gorduraController.clear();
+    musculoController.clear();
+    setState(() {
+      sexoController = 'Feminino';
+      nivelAtividade = 'Moderado';
+    });
   }
 
   Widget selecionarNascimento() {
@@ -272,79 +358,10 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  final emailVazio = emailController.text.trim().isEmpty;
-                  final celularVazio = celularController.text.trim().isEmpty;
-
-                  if (emailVazio && celularVazio) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Informe ao menos um meio de contato. (Celular ou email) ',
-                        ),
-                      ),
-                    );
-                    return;
-                  }
                   if (_formKey.currentState!.validate()) {
                     try {
-                      print('nomeController.text testando');
-
-                      final novoPaciente = Pacientesmodels(
-                        id: widget.paciente?.id,
-                        nome: nomeController.text,
-                        celular: celularController.text,
-                        email: emailController.text,
-                        dataNasc: dataNascSelecionada!.toIso8601String(),
-                        sexo: sexoController,
-                        altura: int.parse(alturaController.text),
-                        peso: double.parse(
-                          pesoController.text.replaceAll(',', '.'),
-                        ),
-                        gordura:
-                            double.tryParse(
-                              gorduraController.text.replaceAll(',', '.'),
-                            ) ??
-                            0.0,
-                        musculo:
-                            double.tryParse(
-                              musculoController.text.replaceAll(',', '.'),
-                            ) ??
-                            0.0,
-                        dataCriacao: dataAlteracao!.toIso8601String(),
-                        nivelAtividade: nivelAtividade,
-                      );
-
-                      if (isEdicao) {
-                        await PacientesRepository().atualizarPaciente(
-                          novoPaciente,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Paciente atualizado!')),
-                        );
-                        Navigator.pop(context, novoPaciente);
-                        return;
-                      } else {
-                        await PacientesRepository().inserirPacientes(
-                          novoPaciente,
-                        );
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Paciente cadastrado!')),
-                        );
-                      }
-
-                      nomeController.clear();
-                      celularController.text = '+55';
-                      emailController.clear();
-                      dataNascSelecionada = DateTime(2000, 1, 1);
-                      alturaController.clear();
-                      pesoController.clear();
-                      gorduraController.clear();
-                      musculoController.clear();
-                      setState(() {
-                        sexoController = 'Feminino';
-                        nivelAtividade = 'Moderado';
-                      });
+                      final paciente = _construirPacientes();
+                      await _salvarPaciente(paciente);
                     } catch (e) {
                       print('Erro ao salvar paciente: $e');
                       ScaffoldMessenger.of(context).showSnackBar(

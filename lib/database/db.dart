@@ -42,6 +42,9 @@ class DB {
 
     await db.execute(_usuario);
     print("Tabela de _usuario criada");
+
+    await db.execute(_historico_paciente);
+    print("Tabela de historico_paciente criada");
   }
 
   Future<void> deletarBanco() async {
@@ -142,6 +145,29 @@ CREATE TABLE refeicao_alimento(
     endereco TEXT,
     caminhoImg TEXT,
     corTema TEXT
+  );
+''';
+  String get _historico_paciente => '''
+  CREATE TABLE historico_paciente (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    paciente_id INTEGER NOT NULL,
+    dieta_id INTEGER,
+    nutri_id INTEGER,
+    peso REAL NOT NULL,
+    gordura REAL,
+    musculo REAL,
+    nivel_atv TEXT NOT NULL,
+
+    imc REAL,
+    img REAL,
+    peso_alvo REAL,
+    obs TEXT,
+
+    data_att TEXT NOT NULL,
+
+    FOREIGN KEY (paciente_id) REFERENCES paciente(id),
+    FOREIGN KEY (dieta_id) REFERENCES dieta(id),
+    FOREIGN KEY (nutri_id) REFERENCES usuario(id)    
   );
 ''';
 }

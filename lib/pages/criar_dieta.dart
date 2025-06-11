@@ -4,12 +4,14 @@ import 'package:nutri/models/refeicao_models.dart';
 import 'package:nutri/pages/myapp.dart';
 import 'package:nutri/repository/dieta_repository.dart';
 import 'package:nutri/repository/refeicao_alimento_repository.dart';
-import 'package:nutri/repository/refeicao_repository.dart';
+import '../repository/refeicao_repository.dart';
 import './dieta/editar_dieta.dart';
 import '../widgets/custom_drawer.dart';
 import '../fuctionsApps/custom_app_bar.dart';
 import '../models/pacientesModels.dart';
 import '../models/dieta_models.dart';
+import '../models/historico_paciente_models.dart';
+import '../repository/historico_paciente_repository.dart';
 
 class CriarDieta extends StatefulWidget {
   final Pacientesmodels? paciente;
@@ -268,37 +270,47 @@ class _CriarDieta extends State<CriarDieta> {
 
   Future<void> salvarRefeicaoAlimentos(List<int> refeicaoIds) async {
     final repo = RefeicaoAlimentoRepository();
-    for (int i = 0; i < refeicoes.length; i++) {
-      final alimentos = refeicoes[i]['alimentos'] as List<Map<String, dynamic>>;
-      print(
-        'Refeição ${refeicoes[i]['nome']} com ${alimentos.length} alimentos',
-      );
-      for (var alimento in alimentos) {
-        final model = RefeicaoAlimentosModels(
-          refeicaoId: refeicaoIds[i],
-          alimentoId: alimento['id'],
-          nome: alimento['nome'],
-          quantidade: parseDouble(alimento['quantidade']),
-          kcal: parseDouble(alimento['energia_kcal']),
-          prot: parseDouble(alimento['proteinas_g']),
-          lip: parseDouble(alimento['lipidios_g']),
-          glic: parseDouble(alimento['glicidios_g']),
-          cal: parseDouble(alimento['calcio_mg']),
-          ferro: parseDouble(alimento['ferro_mg']),
-          vitA: parseDouble(alimento['vit_a_mmg']),
-          vitC: parseDouble(alimento['vit_c_mg']),
-          tiamina: parseDouble(alimento['tiamina_mg']),
-          ribo: parseDouble(alimento['riboflavina_mg']),
-          niacina: parseDouble(alimento['niacina_mg']),
-          sodio: parseDouble(alimento['sodio_mg']),
-          fibras: parseDouble(alimento['fibra_alimentar_g']),
+    try {
+      for (int i = 0; i < refeicoes.length; i++) {
+        final alimentos = (refeicoes[i]['alimentos'] as List)
+            .map((e) => Map<String, dynamic>.from(e))
+            .toList();
+        print(
+          'Refeição ${refeicoes[i]['nome']} com ${alimentos.length} alimentos',
         );
-        try {
-          await repo.insert(model);
-        } catch (e) {
-          print('Erro ao inserir o model de alimentos_refeição: e: $e');
+        for (var alimento in alimentos) {
+          final model = RefeicaoAlimentosModels(
+            refeicaoId: refeicaoIds[i],
+            alimentoId: alimento['id'],
+            nome: alimento['nome'],
+            quantidade: parseDouble(alimento['quantidade']),
+            kcal: parseDouble(alimento['energia_kcal']),
+            prot: parseDouble(alimento['proteinas_g']),
+            lip: parseDouble(alimento['lipidios_g']),
+            glic: parseDouble(alimento['glicidios_g']),
+            cal: parseDouble(alimento['calcio_mg']),
+            ferro: parseDouble(alimento['ferro_mg']),
+            vitA: parseDouble(alimento['vit_a_mmg']),
+            vitC: parseDouble(alimento['vit_c_mg']),
+            tiamina: parseDouble(alimento['tiamina_mg']),
+            ribo: parseDouble(alimento['riboflavina_mg']),
+            niacina: parseDouble(alimento['niacina_mg']),
+            sodio: parseDouble(alimento['sodio_mg']),
+            fibras: parseDouble(alimento['fibra_alimentar_g']),
+          );
+          try {
+            await repo.insert(model);
+            print('Sucesso ao inserir model de alimentos_refeicao');
+          } catch (e) {
+            print('Erro ao inserir o model de alimentos_refeição: e: $e');
+          }
         }
       }
+      print(
+        "Sucesso ao usar a função salvarRefeicaoAlimentos, salvo com sucesso!",
+      );
+    } catch (e) {
+      print('Erro ao salvar os alimentos, linha 308, erro: $e');
     }
   }
 
@@ -311,17 +323,53 @@ class _CriarDieta extends State<CriarDieta> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Dieta salva com sucesso! dieta ID $idDiet')),
       );
+      print('id dieta: $idDiet');
+      try {
+        print('paciente id: ${paciente!.id!}');
+        try {
+          final histo = await HistoricoPacienteRepository()
+              .buscarUltimoHistPaciente(paciente!.id!);
+
+          if (idDiet != null && histo != null) {
+            final historicoAtt = histo.copyWith(dietaId: idDiet);
+            print('historicoAtt $historicoAtt');
+            await HistoricoPacienteRepository().atualizar(historicoAtt);
+
+            print('Sucesso ao atualizar o historico! id dieta: $historicoAtt');
+          }
+        } catch (e) {
+          print('Erro no ultimohistorico $e');
+        }
+        /*       print('ultimoHist.pacienteId: ${ultimoHist!.pacienteId}');
+        print('ultimoHist.peso: ${ultimoHist.peso}');
+        print('ultimoHist.nivelAtv: ${ultimoHist.nivelAtv}');
+        print('ultimoHist.dataAtt: ${ultimoHist.dataAtt}');
+
+        if (ultimoHist != null) {
+          if (idDiet != null) {*/
+        /* final historicoAtt = ultimoHist.copyWith(dietaId: idDiet);
+            print('historicoAtt $historicoAtt');
+            await HistoricoPacienteRepository().atualizar(historicoAtt);
+          
+            print('Sucesso ao atualizar o historico! id dieta: $historicoAtt');
+          
+          }
+          print('idDiet é nulo: $idDiet');
+        }*/
+      } catch (e) {
+        print('Erro ao atualizar o historico! Erro: $e');
+      }
     } catch (e) {
       print('Erro = $e');
     }
 
-    final all = await DietaRepository().joinDieta();
+    /*final all = await DietaRepository().joinDieta();
     for (var row in all) {
       print(' ---- REGISTRO -----');
       row.forEach((key, value) {
         print('$key: $value');
       });
-    }
+    }*/
 
     Navigator.pushReplacement(
       context,

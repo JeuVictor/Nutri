@@ -522,7 +522,7 @@ class _EditarDietaState extends State<EditarDieta> {
                       .toList(),
                   'calcNutri': calcularTotais().toMap(),
                 };
-                print('Refeção salva: $resultado');
+                print('Refeção salva!');
                 Navigator.pop(context, resultado);
               },
               child: const Text('Salvar'),

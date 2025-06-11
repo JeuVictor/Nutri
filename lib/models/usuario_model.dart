@@ -31,6 +31,7 @@ class UsuarioModel {
       'esp': esp,
       'endereco': endereco,
       'caminhoImg': caminhoImg,
+      'corTema': corTema,
     };
   }
 
