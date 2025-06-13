@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:nutri/pages/cadastro_paciente.dart';
+import 'package:nutri/pages/historico/historico_paciente_page.dart';
 import 'package:nutri/repository/pacientes_repository.dart';
 import '../models/pacientesModels.dart';
 import '../fuctionsApps/functions_dialogs.dart';
 import '../fuctionsApps/charts_pacientes.dart';
 import './../fuctionsApps/custom_app_bar.dart';
 import '../widgets/custom_drawer.dart';
+import '../fuctionsApps/graficoPaciente.dart';
 
 class PacienteDetalhes extends StatefulWidget {
   final Pacientesmodels paciente;
@@ -144,9 +146,11 @@ class _PacientesDetalhesState extends State<PacienteDetalhes> {
           icon: Icons.feed_outlined,
           label: 'Historico',
           onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Em breve uma nova funcionalidade!😊'),
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    HistoricoPacientePage(pacienteId: widget.paciente.id!),
               ),
             );
           },
@@ -186,6 +190,10 @@ class _PacientesDetalhesState extends State<PacienteDetalhes> {
                     ),
                     Text(
                       'Peso: ${widget.paciente.peso}',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Text(
+                      'Peso alvo: ${widget.paciente.peso_alvo}',
                       style: TextStyle(fontSize: 18),
                     ),
                     Text(

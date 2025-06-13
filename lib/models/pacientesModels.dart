@@ -7,6 +7,7 @@ class Pacientesmodels {
   String dataNasc;
   int altura;
   double peso;
+  double peso_alvo;
   double gordura;
   double musculo;
   String nivelAtividade;
@@ -14,6 +15,7 @@ class Pacientesmodels {
 
   Pacientesmodels({
     this.id,
+    required this.peso_alvo,
     required this.nome,
     required this.celular,
     required this.email,
@@ -72,6 +74,7 @@ class Pacientesmodels {
       'sexo': sexo,
       'altura': altura,
       'peso': peso,
+      'peso_alvo': peso_alvo,
       'gordura': gordura,
       'musculo': musculo,
       'nivel_atividade': nivelAtividade,
@@ -89,6 +92,7 @@ class Pacientesmodels {
       sexo: map['sexo'],
       altura: map['altura'],
       peso: map['peso'],
+      peso_alvo: map['peso_alvo'],
       gordura: map['gordura'],
       musculo: map['musculo'],
       dataCriacao: map['data_criacao'],
@@ -96,8 +100,26 @@ class Pacientesmodels {
     );
   }
 
+  static Pacientesmodels fromJoinedMap(Map<String, dynamic> map) {
+    return Pacientesmodels(
+      id: map['paciente_id'],
+      nome: map['paciente_nome'],
+      celular: map['paciente_celular'],
+      email: map['paciente_email'],
+      dataNasc: map['paciente_data_nasc'],
+      sexo: map['paciente_sexo'],
+      altura: map['paciente_altura'],
+      peso: map['paciente_peso'],
+      peso_alvo: map['paciente_peso_alvo'],
+      gordura: map['paciente_gordura'],
+      musculo: map['paciente_musculo'],
+      dataCriacao: map['paciente_data_criacao'],
+      nivelAtividade: map['paciente_nivel_atividade'],
+    );
+  }
+
   @override
   String toString() {
-    return 'Pacientesmodels(id: $id, nome: $nome, celular: $celular, email: $email, dataNasc: $dataNasc, sexo: $sexo, altura: $altura, peso: $peso, gordura: $gordura, musculo: $musculo, nivelAtividade: $nivelAtividade, dataCriacao: $dataCriacao )';
+    return 'Pacientesmodels(id: $id, nome: $nome, celular: $celular, email: $email, dataNasc: $dataNasc, sexo: $sexo, altura: $altura, peso: $peso, peso_alvo: $peso_alvo, gordura: $gordura, musculo: $musculo, nivelAtividade: $nivelAtividade, dataCriacao: $dataCriacao )';
   }
 }

@@ -55,6 +55,8 @@ class _CriarDieta extends State<CriarDieta> {
     {'nome': 'Jantar', 'horario': '', 'observacoes': '', 'alimentos': []},
   ];
 
+  final TextEditingController obsController = TextEditingController();
+
   Map<String, double> calcularNutris(List<Map> refeicoes) {
     double kcal = 0.0;
     double carbo = 0.0;
@@ -232,14 +234,98 @@ class _CriarDieta extends State<CriarDieta> {
     );
   }
 
+  Widget frequenciaWidget({
+    required String freqSelect,
+    required Map<String, bool> diasSelect,
+    required Function(String novaFrequencia, Map<String, bool> diasSelect)
+    onFrequenciaMudou,
+  }) {
+    return StatefulBuilder(
+      builder: (context, setState) {
+        bool mostrarSelectDias = freqSelect == 'Personalizado';
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            DropdownButton<String>(
+              value: freqSelect,
+              isExpanded: true,
+              items: ['Todos os dias', 'Segunda a sexta', 'Personalizado']
+                  .map(
+                    (opcao) =>
+                        DropdownMenuItem(child: Text(opcao), value: opcao),
+                  )
+                  .toList(),
+              onChanged: (novaOpcao) {
+                if (novaOpcao != null) {
+                  final novoPersonalizado = novaOpcao == 'Personalizado';
+                  setState(() {
+                    mostrarSelectDias = novoPersonalizado;
+                  });
+                  onFrequenciaMudou(novaOpcao, diasSelect);
+                }
+              },
+            ),
+            if (freqSelect == 'Personalizado' && mostrarSelectDias)
+              Card(
+                elevation: 2,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: diasSelect.entries.map((dia) {
+                          return ChoiceChip(
+                            label: Text(dia.key),
+                            selected: dia.value,
+                            selectedColor: Colors.blue.shade300,
+                            onSelected: (select) {
+                              setState(() {
+                                diasSelect[dia.key] = select;
+                              });
+                            },
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget obsWidgets({required TextEditingController obsController}) {
+    return TextField(
+      controller: obsController,
+      maxLines: 3,
+      decoration: const InputDecoration(
+        labelText: 'Observações gerais',
+        border: OutlineInputBorder(),
+      ),
+    );
+  }
+
   Future<int> salvarDieta() async {
     final novaDieta = DietaModels(
       nome:
           'Dieta de ${paciente!.nome} criada em ${DateTime.now().toLocal().toString().split(' ')[0]}',
       dataCriacao: DateTime.now().toIso8601String(),
       pacienteId: paciente!.id!,
+      obs: obsController.text,
+      frequencia: frqueciaSelecionada == 'Personalizado'
+          ? diasSelecionados.entries
+                .where((e) => e.value)
+                .map((e) => e.key)
+                .join(', ')
+          : frqueciaSelecionada,
     );
-
+    print(' frequencia da dieta : ${novaDieta.frequencia}');
     return await DietaRepository().insert(novaDieta);
   }
 
@@ -340,29 +426,13 @@ class _CriarDieta extends State<CriarDieta> {
         } catch (e) {
           print('Erro no ultimohistorico $e');
         }
-        /*       print('ultimoHist.pacienteId: ${ultimoHist!.pacienteId}');
-        print('ultimoHist.peso: ${ultimoHist.peso}');
-        print('ultimoHist.nivelAtv: ${ultimoHist.nivelAtv}');
-        print('ultimoHist.dataAtt: ${ultimoHist.dataAtt}');
-
-        if (ultimoHist != null) {
-          if (idDiet != null) {*/
-        /* final historicoAtt = ultimoHist.copyWith(dietaId: idDiet);
-            print('historicoAtt $historicoAtt');
-            await HistoricoPacienteRepository().atualizar(historicoAtt);
-          
-            print('Sucesso ao atualizar o historico! id dieta: $historicoAtt');
-          
-          }
-          print('idDiet é nulo: $idDiet');
-        }*/
       } catch (e) {
         print('Erro ao atualizar o historico! Erro: $e');
       }
     } catch (e) {
       print('Erro = $e');
     }
-
+    //teste de dieta
     /*final all = await DietaRepository().joinDieta();
     for (var row in all) {
       print(' ---- REGISTRO -----');
@@ -534,36 +604,18 @@ class _CriarDieta extends State<CriarDieta> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-              DropdownButton<String>(
-                value: frqueciaSelecionada,
-                isExpanded: true,
-                items: ['Todos os dias', 'Segunda a sexta', 'Personalizado']
-                    .map((opcao) {
-                      return DropdownMenuItem(child: Text(opcao), value: opcao);
-                    })
-                    .toList(),
-                onChanged: (novaOpcao) {
-                  if (novaOpcao != null) {
-                    setState(() {
-                      frqueciaSelecionada = novaOpcao;
-                    });
-                  }
+              frequenciaWidget(
+                freqSelect: frqueciaSelecionada,
+                diasSelect: diasSelecionados,
+                onFrequenciaMudou: (novaFreq, dias) {
+                  setState(() {
+                    frqueciaSelecionada = novaFreq;
+                    diasSelecionados = Map.from(dias);
+                  });
                 },
               ),
-              if (frqueciaSelecionada == 'Personalizado')
-                Column(
-                  children: diasSelecionados.keys.map((dia) {
-                    return CheckboxListTile(
-                      title: Text(dia),
-                      value: diasSelecionados[dia],
-                      onChanged: (bool? value) {
-                        setState(() {
-                          diasSelecionados[dia] = value ?? false;
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
+              const SizedBox(height: 16),
+              obsWidgets(obsController: obsController),
               _buildResumoNutricional(),
               if (paciente != null)
                 Padding(

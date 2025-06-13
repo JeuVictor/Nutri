@@ -27,6 +27,7 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
   String sexoController = 'Feminino';
   final alturaController = TextEditingController();
   final pesoController = TextEditingController();
+  final pesoAlvoController = TextEditingController();
   final gorduraController = TextEditingController();
   final musculoController = TextEditingController();
   String nivelAtividade = 'Moderado';
@@ -46,6 +47,7 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
       sexoController = paciente.sexo;
       alturaController.text = paciente.altura.toString();
       pesoController.text = paciente.peso.toString();
+      pesoAlvoController.text = paciente.peso_alvo.toString();
       gorduraController.text = paciente.gordura.toString();
       musculoController.text = paciente.musculo.toString();
       nivelAtividade = paciente.nivelAtividade;
@@ -80,6 +82,8 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
       sexo: sexoController,
       altura: int.parse(alturaController.text),
       peso: double.parse(pesoController.text.replaceAll(',', '.')),
+      peso_alvo:
+          double.tryParse(pesoAlvoController.text.replaceAll(',', '.')) ?? 0.0,
       gordura:
           double.tryParse(gorduraController.text.replaceAll(',', '.')) ?? 0.0,
       musculo:
@@ -97,6 +101,23 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Paciente atualizado!')));
+      try {
+        await HistoricoPacienteRepository().inserir(
+          HistoricoPaciente(
+            pacienteId: paciente.id!,
+            peso: paciente.peso,
+            pesoAlvo: paciente.peso_alvo,
+            nivelAtv: paciente.nivelAtividade,
+            dataAtt: paciente.dataCriacao,
+            gordura: paciente.gordura ?? 0.0,
+            musculo: paciente.musculo ?? 0.0,
+            
+          ),
+        );
+        print('Novo Historico de atualização de paciente. Salvo com sucesso!');
+      } catch (e) {
+        print('Erro ao incluir os dados em historico do paciente erro: $e');
+      }
       Navigator.pop(context, paciente);
     } else {
       final id = await PacientesRepository().inserirPacientes(paciente);
@@ -109,12 +130,14 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
           HistoricoPaciente(
             pacienteId: id,
             peso: paciente.peso,
+            pesoAlvo: paciente.peso_alvo,
             nivelAtv: paciente.nivelAtividade,
             dataAtt: paciente.dataCriacao,
             gordura: paciente.gordura ?? 0.0,
             musculo: paciente.musculo ?? 0.0,
           ),
         );
+        print('Historico salvo com sucesso!');
       } catch (e) {
         print('Erro ao incluir os dados em historico do paciente erro: $e');
       }
@@ -129,6 +152,7 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
     dataNascSelecionada = DateTime(2000, 1, 1);
     alturaController.clear();
     pesoController.clear();
+    pesoAlvoController.clear();
     gorduraController.clear();
     musculoController.clear();
     setState(() {
@@ -226,6 +250,7 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
     emailController.dispose();
     alturaController.dispose();
     pesoController.dispose();
+    pesoAlvoController.dispose();
     gorduraController.dispose();
     musculoController.dispose();
     super.dispose();
@@ -323,6 +348,13 @@ class _CadastroPacienteState extends State<CadastroPaciente> {
                   }
                   return null;
                 },
+              ),
+              TextFormField(
+                controller: pesoAlvoController,
+                decoration: const InputDecoration(
+                  labelText: 'Peso alvo do (kg)',
+                ),
+                keyboardType: TextInputType.number,
               ),
 
               TextFormField(

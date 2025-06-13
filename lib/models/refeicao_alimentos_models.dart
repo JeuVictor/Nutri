@@ -41,6 +41,7 @@ class RefeicaoAlimentosModels {
 
   factory RefeicaoAlimentosModels.fromMap(Map<String, dynamic> map) {
     return RefeicaoAlimentosModels(
+      id: map['id'],
       refeicaoId: map['refeicaoId'],
       alimentoId: map['alimentoId'],
       nome: map['nome'],
@@ -60,7 +61,28 @@ class RefeicaoAlimentosModels {
       fibras: map['fibras'],
     );
   }
-
+  factory RefeicaoAlimentosModels.fromJoinMap(Map<String, dynamic> map) {
+    return RefeicaoAlimentosModels(
+      id: map['refeicao_alimento_id'],
+      refeicaoId: map['refeicaoId'],
+      alimentoId: map['alimentoId'],
+      nome: map['refeicao_alimento_nome'],
+      quantidade: map['quantidade'],
+      kcal: map['kcal'],
+      prot: map['prot'],
+      lip: map['lip'],
+      glic: map['glic'],
+      cal: map['cal'],
+      ferro: map['ferro'],
+      vitA: map['vitA'],
+      vitC: map['vitC'],
+      tiamina: map['tiamina'],
+      ribo: map['ribo'],
+      niacina: map['niacina'],
+      sodio: map['sodio'],
+      fibras: map['fibras'],
+    );
+  }
   Map<String, dynamic> toMap() {
     return {
       'id': id,

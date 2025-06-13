@@ -307,7 +307,7 @@ class _EditarDietaState extends State<EditarDieta> {
     if (_mostrarBuscaAvancada == true) {
       return ExpansionTile(
         title: const Text('Busca Avançada'),
-        initiallyExpanded: true,
+        initiallyExpanded: false,
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),

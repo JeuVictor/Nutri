@@ -63,6 +63,7 @@ class DB {
       sexo TEXT, 
       altura INTEGER,      
       peso REAL,
+      peso_alvo REAL,
       gordura REAL,
       musculo REAL,
       nivel_atividade TEXT, 
@@ -95,6 +96,8 @@ CREATE TABLE alimentos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT,
     data_criacao TEXT,
+    frequencia TEXT,
+    obs TEXT,
     paciente_id INTEGER,
     FOREIGN KEY (paciente_id) REFERENCES paciente(id)
   );
@@ -170,4 +173,6 @@ CREATE TABLE refeicao_alimento(
     FOREIGN KEY (nutri_id) REFERENCES usuario(id)    
   );
 ''';
+
+ 
 }

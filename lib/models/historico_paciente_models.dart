@@ -50,6 +50,24 @@ class HistoricoPaciente {
     );
   }
 
+  factory HistoricoPaciente.fromJoinMap(Map<String, dynamic> map) {
+    return HistoricoPaciente(
+      pacienteId: map['paciente_id'],
+      peso: map['peso'],
+      nivelAtv: map['nivel_atv'],
+      dataAtt: map['data_att'],
+      id: map['historico_id'],
+      dietaId: map['dieta_id'],
+      gordura: map['gordura'],
+      imc: map['imc'],
+      img: map['img'],
+      musculo: map['musculo'],
+      nutriId: map['nutri_id'],
+      obs: map['obs'],
+      pesoAlvo: map['peso_alvo'],
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
