@@ -132,7 +132,7 @@ class Graficopaciente extends StatelessWidget {
         color: Colors.orange,
         value: carbo,
         title: "${((carbo / total) * 100).round()}%",
-        radius: 50,
+        radius: 40,
         titleStyle: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
@@ -142,7 +142,7 @@ class Graficopaciente extends StatelessWidget {
         color: Colors.redAccent,
         value: prot,
         title: "${((prot / total) * 100).round()}%",
-        radius: 50,
+        radius: 40,
         titleStyle: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
@@ -152,7 +152,7 @@ class Graficopaciente extends StatelessWidget {
         color: Colors.purple,
         value: lip,
         title: "${((lip / total) * 100).round()}%",
-        radius: 50,
+        radius: 40,
         titleStyle: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,

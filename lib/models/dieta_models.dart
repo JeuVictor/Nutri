@@ -26,15 +26,15 @@ class DietaModels {
     );
   }
   factory DietaModels.fromJoinMap(Map<String, dynamic> map) {
-  return DietaModels(
-    id: map['dieta_id'],
-    nome: map['dieta_nome'],
-    dataCriacao: map['data_criacao'],
-    pacienteId: map['paciente_id'],
-    frequencia: map['frequencia'],
-    obs: map['obs'],
-  );
-}
+    return DietaModels(
+      id: map['dieta_id'],
+      nome: map['dieta_nome'] ?? 'Sem nome',
+      dataCriacao: map['data_criacao'] ?? '',
+      pacienteId: map['paciente_id'],
+      frequencia: map['frequencia'] ?? '',
+      obs: map['obs'] ?? '',
+    );
+  }
 
   DietaModels copyWith({
     int? id,

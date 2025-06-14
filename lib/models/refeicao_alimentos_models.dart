@@ -62,27 +62,30 @@ class RefeicaoAlimentosModels {
     );
   }
   factory RefeicaoAlimentosModels.fromJoinMap(Map<String, dynamic> map) {
+    print('DEBUG Alimento JOIN => $map'); // Ajuda a entender o que veio nulo
+
     return RefeicaoAlimentosModels(
-      id: map['refeicao_alimento_id'],
-      refeicaoId: map['refeicaoId'],
-      alimentoId: map['alimentoId'],
-      nome: map['refeicao_alimento_nome'],
-      quantidade: map['quantidade'],
-      kcal: map['kcal'],
-      prot: map['prot'],
-      lip: map['lip'],
-      glic: map['glic'],
-      cal: map['cal'],
-      ferro: map['ferro'],
-      vitA: map['vitA'],
-      vitC: map['vitC'],
-      tiamina: map['tiamina'],
-      ribo: map['ribo'],
-      niacina: map['niacina'],
-      sodio: map['sodio'],
-      fibras: map['fibras'],
+      id: map['refeicao_alimento_id'] ?? 0,
+      refeicaoId: map['refeicaoId'] ?? 0,
+      alimentoId: map['alimentoId'] ?? 0,
+      nome: map['refeicao_alimento_nome'] ?? 'Sem nome',
+      quantidade: (map['quantidade'] ?? 0).toDouble(),
+      kcal: (map['kcal'] ?? 0).toDouble(),
+      prot: (map['prot'] ?? 0).toDouble(),
+      lip: (map['lip'] ?? 0).toDouble(),
+      glic: (map['glic'] ?? 0).toDouble(),
+      cal: (map['cal'] ?? 0).toDouble(),
+      ferro: (map['ferro'] ?? 0).toDouble(),
+      vitA: (map['vitA'] ?? 0).toDouble(),
+      vitC: (map['vitC'] ?? 0).toDouble(),
+      tiamina: (map['tiamina'] ?? 0).toDouble(),
+      ribo: (map['ribo'] ?? 0).toDouble(),
+      niacina: (map['niacina'] ?? 0).toDouble(),
+      sodio: (map['sodio'] ?? 0).toDouble(),
+      fibras: (map['fibras'] ?? 0).toDouble(),
     );
   }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,

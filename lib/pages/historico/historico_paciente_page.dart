@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nutri/models/pacientesModels.dart';
@@ -328,6 +330,87 @@ class _HistoricoPacienteState extends State<HistoricoPacientePage> {
     );
   }
 
+  /*
+  Widget buildHistoricoDieta(List<HistoticoCompletoModel> historico) {
+    return ListView.builder(
+      itemCount: historico.length,
+      itemBuilder: (context, index) {
+        final item = historico[index];
+        return Card(
+          margin: const EdgeInsets.all(12),
+          child: ExpansionTile(
+            title: Text(item.dieta?.nome ?? 'Dieta'),
+            subtitle: Text("Criada em ${item.dieta?.dataCriacao ?? '----'}"),
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Frequência: ${item.dieta?.frequencia ?? '---'}\nObs: ${item.dieta?.obs ?? ""}",
+                ),
+              ),
+              ...?item.refeicoes?.map((refeicao) {
+                final ref = refeicao.refeicao;
+                final alimentos = refeicao.alimentos;
+
+                final corAleatoria = _corAleatoria(ref.nome.hashCode);
+
+                return Card(
+                  color: corAleatoria.withOpacity(0.1),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${ref.nome} - ${ref.horario}",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: corAleatoria,
+                        ),
+                      ),
+                      if (ref.observacoes.trim().isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: Text(
+                            "Obs: ${ref.observacoes}",
+                            style: const TextStyle(fontStyle: FontStyle.italic),
+                          ),
+                        ),
+                      const SizedBox(height: 8),
+                      ...alimentos.map(
+                        (alimento) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(child: Text(alimento.nome)),
+                              Text(
+                                "${alimento.quantidade.toStringAsFixed(0)}g",
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+*/
+  Color _corAleatoria(int seed) {
+    final random = Random(seed);
+
+    return Colors.primaries[random.nextInt(Colors.primaries.length)];
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -377,6 +460,7 @@ class _HistoricoPacienteState extends State<HistoricoPacientePage> {
                               lip: historicoCompleto!.paciente!.lipidios,
                               prot: historicoCompleto!.paciente!.proteina,
                             ),
+                            // buildHistoricoDieta([historicoCompleto!]),
                           ],
                         ),
                 ),
